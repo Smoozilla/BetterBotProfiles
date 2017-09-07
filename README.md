@@ -1,2 +1,3 @@
 # BetterBotProfiles
-Including all submitted profiles
+
+Including basic and extended rotation profiles for BetterBot
