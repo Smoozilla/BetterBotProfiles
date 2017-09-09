@@ -1,75 +1,77 @@
 <project name="BetterBotProfiles" basedir="." default="createAll">
 	
     <property name="src.dir" value="src"/>
-	<property name="dist.dir" value="dist"/>
+		<property name="dist.dir" value="dist"/>
     <property name="build.dir" value="build"/>
-    <property name="classes.dir" value="${build.dir}/classes"/>
-    <property name="jars.dir" value="${dist.dir}/jars"/>
 
+	<target name="clean">
+		<delete dir="${build.dir}"/>
+	</target>
+	
 	<target name="compileAll">
-		<mkdir dir="${classes.dir}"/>
-		<javac includeantruntime="false" srcdir="${src.dir}/rotations" destdir="${classes.dir}" classpath="lib/libBetterBot.jar"/>
+		<mkdir dir="${build.dir}"/>
+		<javac includeantruntime="false" srcdir="${src.dir}/rotations" destdir="${build.dir}" classpath="lib/libBetterBot.jar"/>
 	</target>
 	
 	<target name="createAllJars" depends="compileAll">
-		<mkdir dir="${jars.dir}"/>
-		<jar destfile="${jars.dir}/Rotations.jar" basedir="${classes.dir}"/>
+		<mkdir dir="${dist.dir}"/>
+		<jar destfile="${dist.dir}/Rotations.jar" basedir="${build.dir}"/>
 	</target>
 	
 	<target name="exportDruid">
-		<mkdir dir="${classes.dir}"/>
-		<javac includeantruntime="false" srcdir="${src.dir}/rotations" includes="${src.dir}/rotations/DruidSolver.java" destdir="${classes.dir}" classpath="lib/libBetterBot.jar"/>
-		<mkdir dir="${jars.dir}"/>
-		<jar destfile="${jars.dir}/DruidSolver.jar" basedir="${classes.dir}"/>		
-	</target>
+		<mkdir dir="${build.dir}"/>
+		<javac includeantruntime="false" srcdir="${src.dir}/rotations" includes="DruidSolver.java" destdir="${build.dir}" classpath="lib/libBetterBot.jar"/>
+		<mkdir dir="${dist.dir}"/>
+		<jar basedir="${build.dir}/rotations" destfile="${dist.dir}/DruidSolver.jar" includes="DruidSolver.class"/>
+	</target>	
 	
-	<target name="exportHunter">
-		<mkdir dir="${classes.dir}"/>
-		<javac includeantruntime="false" srcdir="${src.dir}/rotations" includes="${src.dir}/rotations/HunterSolver.java" destdir="${classes.dir}" classpath="lib/libBetterBot.jar"/>
-		<mkdir dir="${jars.dir}"/>
-		<jar destfile="${jars.dir}/HunterSolver.jar" basedir="${classes.dir}"/>		
-	</target>
+	<target name="exportHunter" depends="clean">
+		<mkdir dir="${build.dir}"/>
+		<javac includeantruntime="false" srcdir="${src.dir}/rotations" includes="HunterSolver.java" destdir="${build.dir}" classpath="lib/libBetterBot.jar"/>
+		<mkdir dir="${dist.dir}"/>
+		<jar basedir="${build.dir}/rotations" destfile="${dist.dir}/HunterSolver.jar" includes="HunterSolver.class"/>
+	</target>	
 	
 	<target name="exportMage">
-		<mkdir dir="${classes.dir}"/>
-		<javac includeantruntime="false" srcdir="${src.dir}/rotations" includes="${src.dir}/rotations/MageSolver.java" destdir="${classes.dir}" classpath="lib/libBetterBot.jar"/>
-		<mkdir dir="${jars.dir}"/>
-		<jar destfile="${jars.dir}/MageSolver.jar" basedir="${classes.dir}"/>		
+		<mkdir dir="${build.dir}"/>
+		<javac includeantruntime="false" srcdir="${src.dir}/rotations" includes="MageSolver.java" destdir="${build.dir}" classpath="lib/libBetterBot.jar"/>
+		<mkdir dir="${dist.dir}"/>
+		<jar basedir="${build.dir}/rotations" destfile="${dist.dir}/MageSolver.jar" includes="MageSolver.class"/>
 	</target>
 	
 	<target name="exportPaladin">
-		<mkdir dir="${classes.dir}"/>
-		<javac includeantruntime="false" srcdir="${src.dir}/rotations" includes="${src.dir}/rotations/PaladinSolver.java" destdir="${classes.dir}" classpath="lib/libBetterBot.jar"/>
-		<mkdir dir="${jars.dir}"/>
-		<jar destfile="${jars.dir}/PaladinSolver.jar" basedir="${classes.dir}"/>		
+		<mkdir dir="${build.dir}"/>
+		<javac includeantruntime="false" srcdir="${src.dir}/rotations" includes="PaladinSolver.java" destdir="${build.dir}" classpath="lib/libBetterBot.jar"/>
+		<mkdir dir="${dist.dir}"/>
+		<jar basedir="${build.dir}/rotations" destfile="${dist.dir}/PaladinSolver.jar" includes="PaladinSolver.class"/>
 	</target>
 	
 	<target name="exportPriest">
-		<mkdir dir="${classes.dir}"/>
-		<javac includeantruntime="false" srcdir="${src.dir}/rotations" includes="${src.dir}/rotations/PriestSolver.java" destdir="${classes.dir}" classpath="lib/libBetterBot.jar"/>
-		<mkdir dir="${jars.dir}"/>
-		<jar destfile="${jars.dir}/PriestSolver.jar" basedir="${classes.dir}"/>		
+		<mkdir dir="${build.dir}"/>
+		<javac includeantruntime="false" srcdir="${src.dir}/rotations" includes="PriestSolver.java" destdir="${build.dir}" classpath="lib/libBetterBot.jar"/>
+		<mkdir dir="${dist.dir}"/>
+		<jar basedir="${build.dir}/rotations" destfile="${dist.dir}/PriestSolver.jar" includes="PriestSolver.class"/>
 	</target>
 	
 	<target name="exportRogue">
-		<mkdir dir="${classes.dir}"/>
-		<javac includeantruntime="false" srcdir="${src.dir}/rotations" includes="${src.dir}/rotations/RogueSolver.java" destdir="${classes.dir}" classpath="lib/libBetterBot.jar"/>
-		<mkdir dir="${jars.dir}"/>
-		<jar destfile="${jars.dir}/RogueSolver.jar" basedir="${classes.dir}"/>		
+		<mkdir dir="${build.dir}"/>
+		<javac includeantruntime="false" srcdir="${src.dir}/rotations" includes="RogueSolver.java" destdir="${build.dir}" classpath="lib/libBetterBot.jar"/>
+		<mkdir dir="${dist.dir}"/>
+		<jar basedir="${build.dir}/rotations" destfile="${dist.dir}/RogueSolver.jar" includes="RogueSolver.class"/>
 	</target>
 	
 	<target name="exportShaman">
-		<mkdir dir="${classes.dir}"/>
-		<javac includeantruntime="false" srcdir="${src.dir}/rotations" includes="${src.dir}/rotations/ShamanSolver.java" destdir="${classes.dir}" classpath="lib/libBetterBot.jar"/>
-		<mkdir dir="${jars.dir}"/>
-		<jar destfile="${jars.dir}/ShamanSolver.jar" basedir="${classes.dir}"/>		
+		<mkdir dir="${build.dir}"/>
+		<javac includeantruntime="false" srcdir="${src.dir}/rotations" includes="ShamanSolver.java" destdir="${build.dir}" classpath="lib/libBetterBot.jar"/>
+		<mkdir dir="${dist.dir}"/>
+		<jar basedir="${build.dir}" destfile="${dist.dir}/ShamanSolver.jar" includes="rotations/ShamanSolver.class"/>
 	</target>
 	
 	<target name="exportWarrior">
-		<mkdir dir="${classes.dir}"/>
-		<javac includeantruntime="false" srcdir="${src.dir}/rotations" includes="${src.dir}/rotations/WarriorSolver.java" destdir="${classes.dir}" classpath="lib/libBetterBot.jar"/>
-		<mkdir dir="${jars.dir}"/>
-		<jar destfile="${jars.dir}/WarriorSolver.jar" basedir="${classes.dir}"/>		
+		<mkdir dir="${build.dir}"/>
+		<javac includeantruntime="false" srcdir="${src.dir}/rotations" includes="WarriorSolver.java" destdir="${build.dir}" classpath="lib/libBetterBot.jar"/>
+		<mkdir dir="${dist.dir}"/>
+		<jar basedir="${build.dir}/rotations" destfile="${dist.dir}/WarriorSolver.jar" includes="WarriorSolver.class"/>
 	</target>
 	
 	<target name="createAll" depends="createAllJars,exportDruid,exportHunter,exportMage,exportPaladin,exportPriest,exportRogue,exportShaman,exportWarrior"/>
