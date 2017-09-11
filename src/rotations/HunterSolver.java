@@ -31,6 +31,7 @@ public class HunterSolver implements RotationSolver {
   // Spells
   int mRaptorStrike[] = { 2973, 14260, 14261, 14262, 14263, 14264, 14265, 14266 };
   int mArcaneShot[] = { 3044, 14281, 14282, 14283, 14284, 14285, 14286, 14287 };
+  int mConcussiveShot = 5116;
   int mMongooseBite[] = { 1495, 14269, 14270, 14271 };
 
   // Buffs
@@ -74,15 +75,19 @@ public class HunterSolver implements RotationSolver {
   @Override
   public void combat(Unit u) {
 
-    List<Unit> attackers = mBot.getAttackers();
     // Make sure the pet is attacked and not the player
-    for (Unit a : attackers) {
-      if (a.getTarget() == mPlayer.getGUID()) {
-        a.target();
-        mKeyboard.press(KeyEvent.VK_CONTROL);
-        mKeyboard.type('1');
-        mKeyboard.release(KeyEvent.VK_CONTROL);
-        break;
+    if (mPlayerLevel >= 10) {
+      List<Unit> attackers = mBot.getAttackers();
+      if (attackers.size() > 1) {
+        for (Unit a : attackers) {
+          if (a.getTarget() == mPlayer.getGUID()) {
+            a.target();
+            mKeyboard.press(KeyEvent.VK_CONTROL);
+            mKeyboard.type('1');
+            mKeyboard.release(KeyEvent.VK_CONTROL);
+            break;
+          }
+        }
       }
     }
 
@@ -103,7 +108,7 @@ public class HunterSolver implements RotationSolver {
     }
 
     // Range Attacks
-    if (targetDistance > 8) {
+    if (targetDistance > 9) {
 
       // Hunter's Mark
       if (mPlayerLevel >= 6 && !u.hasAura(mHuntersMark) && targetHealth >= 0.2f && manaValue >= 0.1f) {
@@ -169,7 +174,6 @@ public class HunterSolver implements RotationSolver {
     }
 
     if (mPlayerLevel >= 10) {
-
       // Call Pet
       if (mPet == null) {
         switchActionBar(2);
@@ -224,10 +228,31 @@ public class HunterSolver implements RotationSolver {
 
   @Override
   public int getPullDistance(Unit u) {
-    return 35;
+    return 30;
   }
 
+  long waitFlag = System.currentTimeMillis();
+
   @Override
-  public void approaching(Unit u) {    
+  public void approaching(Unit u) {
+
+    // Slow dooooown!
+    if (System.currentTimeMillis() - waitFlag > 500) {
+      // Check for buffs
+      if (!isFullBuffed()) {
+        return;
+      }
+      // Hunter's Mark
+      else if (mPlayerLevel >= 6 && !u.hasAura(mHuntersMark) && u.getDistance() < 40) {
+        mKeyboard.type('8');
+        return;
+      }
+      // Concussive Shot
+      else if (mPlayerLevel >= 8 && !u.hasAura(mConcussiveShot) && !mBot.anyOnCD(mConcussiveShot)
+          && u.getDistance() < 35) {
+        mKeyboard.type('1');
+        return;
+      }
+    }
   }
 }
