@@ -236,8 +236,10 @@ public class HunterSolver implements RotationSolver {
   @Override
   public void approaching(Unit u) {
 
+    long now = System.currentTimeMillis();
     // Slow dooooown!
-    if (System.currentTimeMillis() - waitFlag > 500) {
+    if (now - waitFlag > 500) {
+      waitFlag = now;
       // Check for buffs
       if (!isFullBuffed()) {
         return;
