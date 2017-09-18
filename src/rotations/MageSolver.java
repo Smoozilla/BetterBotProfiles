@@ -64,7 +64,7 @@ public class MageSolver implements RotationSolver {
     mDrinking = false;
   }
 
-  public void switchActionBar(int bar) {
+  void switchActionBar(int bar) {
     if (mActionBar != bar) {
       mKeyboard.press(KeyEvent.VK_SHIFT);
       mKeyboard.type("" + bar);
@@ -75,6 +75,7 @@ public class MageSolver implements RotationSolver {
 
   @Override
   public void combat(Unit u) {
+    switchActionBar(1);
 
     // Ice Block
     if (mPlayerLevel >= 30 && mPlayer.getHealthFloat() < 0.1f && !mBot.anyOnCD(mIceBlock)) {
@@ -101,6 +102,7 @@ public class MageSolver implements RotationSolver {
       return;
     }
 
+    // Use a mana gem
     if (mPlayerLevel >= 28 && manaValue < 0.15f && mInventory.getItemCount(mManaGems) > 0) {
       mKeyboard.type('9');
     }
@@ -120,7 +122,8 @@ public class MageSolver implements RotationSolver {
 
   @Override
   public void pull(Unit u) {
-    combat(u);
+    if(isFullBuffed())
+      combat(u);
   }
 
   @Override
@@ -138,6 +141,7 @@ public class MageSolver implements RotationSolver {
 
   boolean isFullBuffed() {
 
+    // We're conjuring a mana gem
     if (mPlayer.isCasting()) {
       return true;
     }
@@ -145,21 +149,28 @@ public class MageSolver implements RotationSolver {
     // Arcane Intellect
     if (!mPlayer.hasAura(mArcaneIntellect)) {
       switchActionBar(2);
-      mKeyboard.type('1');
+      mKeyboard.type('2');
       return false;
     }
 
     // Frost/Ice Armor
     if (!mPlayer.hasAura(mFrostArmor)) {
       switchActionBar(2);
-      mKeyboard.type('2');
+      mKeyboard.type('3');
       return false;
     }
 
     // Dampen Magic
     if (mPlayerLevel >= 12 && !mPlayer.hasAura(mDampenMagic)) {
       switchActionBar(2);
-      mKeyboard.type('3');
+      mKeyboard.type('4');
+      return false;
+    }
+
+    // Conjure a mana gem
+    if (mPlayerLevel >= 28 && mInventory.getItemCount(mManaGems) == 0) {
+      switchActionBar(2);
+      mKeyboard.type('6');
       return false;
     }
 
@@ -173,21 +184,21 @@ public class MageSolver implements RotationSolver {
       return;
     }
 
-    // Make some water
+    // Conjure some water
     if (mPlayerLevel >= 4 && mInventory.getItemCount(mConjuredWater) <= 1) {
       switchActionBar(2);
       mKeyboard.type('8');
       return;
     }
 
-    // Make some food
+    // Conjure some food
     if (mPlayerLevel >= 6 && mInventory.getItemCount(mConjuredFood) <= 1) {
       switchActionBar(2);
       mKeyboard.type('7');
       return;
     }
 
-    // Make a mana gem
+    // Conjure a mana gem
     if (mPlayerLevel >= 28 && mInventory.getItemCount(mManaGems) == 0) {
       switchActionBar(2);
       mKeyboard.type('6');
@@ -240,6 +251,10 @@ public class MageSolver implements RotationSolver {
   }
 
   @Override
-  public void approaching(Unit u) {    
+  public void approaching(Unit u) {
+    // Ice Barrier
+    if (mPlayerLevel >= 40 && u.getDistance() < 40 && !mBot.anyOnCD(mIceBarrier) && !mPlayer.hasAura(mIceBarrier)) {
+      mKeyboard.type('5');
+    }
   }
 }
