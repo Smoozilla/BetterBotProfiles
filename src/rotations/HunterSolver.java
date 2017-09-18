@@ -51,6 +51,7 @@ public class HunterSolver implements RotationSolver {
   public HunterSolver(BetterBot bot) {
     mBot = bot;
     mPlayer = bot.getPlayer();
+    mPet = mPlayer.getPet();
     mKeyboard = bot.getKeyboard();
     mPlayerLevel = mPlayer.getLevel();
     mActionBar = 1;
@@ -62,7 +63,7 @@ public class HunterSolver implements RotationSolver {
     mDrinking = false;
   }
 
-  public void switchActionBar(int bar) {
+  void switchActionBar(int bar) {
     if (mActionBar != bar) {
       mKeyboard.press(KeyEvent.VK_SHIFT);
       mKeyboard.type("" + bar);
@@ -74,7 +75,8 @@ public class HunterSolver implements RotationSolver {
 
   @Override
   public void combat(Unit u) {
-
+    switchActionBar(1);
+    
     // Make sure the pet is attacked and not the player
     if (mPlayerLevel >= 10) {
       List<Unit> attackers = mBot.getAttackers();
@@ -101,7 +103,7 @@ public class HunterSolver implements RotationSolver {
     float targetHealth = u.getHealthFloat();
 
     // Mend Pet
-    if (mPet.getHealthFloat() <= 0.4f && mPlayer.getHealthFloat() >= 0.5f) {
+    if (mPet != null && mPet.getHealthFloat() <= 0.4f && mPlayer.getHealthFloat() >= 0.5f) {
       switchActionBar(2);
       mKeyboard.type('4');
       switchActionBar(1);
@@ -128,18 +130,19 @@ public class HunterSolver implements RotationSolver {
       }
     }
     // Melee Attacks
-    else if (manaValue >= 0.15f) {
-      /*
-       * // Mongoose Bite if(mPlayerLevel >= 16 && !mBot.anyOnCD(mMongooseBite)) {
-       * mKeyboard.type('5'); } // Raptor Strike else
-       */if (!mBot.anyOnCD(mRaptorStrike)) {
+    else if (manaValue >= 0.15f) {      
+      // Mongoose Bite
+      //if(mPlayerLevel >= 16 && !mBot.anyOnCD(mMongooseBite)) {
+      //  mKeyboard.type('5');
+      //}
+      // Raptor Strike else
+      if (!mBot.anyOnCD(mRaptorStrike)) {
         mKeyboard.type('2');
       }
     }
     // Auto Attack
     else {
       mKeyboard.type('7');
-
     }
   }
 
