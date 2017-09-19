@@ -103,7 +103,7 @@ public class HunterSolver implements RotationSolver {
     float targetHealth = u.getHealthFloat();
 
     // Mend Pet
-    if (mPet != null && mPet.getHealthFloat() <= 0.4f && mPlayer.getHealthFloat() >= 0.5f) {
+    if (mPet != null && !mPet.isDead() && mPet.getHealthFloat() <= 0.4f && mPlayer.getHealthFloat() >= 0.5f) {
       switchActionBar(2);
       mKeyboard.type('4');
       switchActionBar(1);
@@ -130,25 +130,26 @@ public class HunterSolver implements RotationSolver {
       }
     }
     // Melee Attacks
-    else if (manaValue >= 0.15f) {      
+    else {
       // Mongoose Bite
       //if(mPlayerLevel >= 16 && !mBot.anyOnCD(mMongooseBite)) {
       //  mKeyboard.type('5');
       //}
       // Raptor Strike else
-      if (!mBot.anyOnCD(mRaptorStrike)) {
+      if (!mBot.anyOnCD(mRaptorStrike) && manaValue >= 0.15f) {
         mKeyboard.type('2');
       }
-    }
-    // Auto Attack
-    else {
-      mKeyboard.type('7');
-    }
+      // Auto Attack
+      else {
+        mKeyboard.type('7');
+      }
+    }    
   }
 
   @Override
   public void pull(Unit u) {
-    combat(u);
+    if(isPetAlive())
+      combat(u);
   }
 
   @Override
@@ -164,24 +165,17 @@ public class HunterSolver implements RotationSolver {
     return false;
   }
 
-  boolean isFullBuffed() {
-
+  boolean isPetAlive() {
+    
     if (mPlayer.isCasting())
       return false;
 
-    // Aspect of the Money OR Aspect of the Hawk
-    if (mPlayerLevel >= 4 && !mPlayer.hasAura(mAspectOfTheMonkey) && !mPlayer.hasAura(mAspectOfTheHawk)) {
-      switchActionBar(2);
-      mKeyboard.type('7');
-      return false;
-    }
-
     if (mPlayerLevel >= 10) {
+      mPet = mPlayer.getPet(); // Make sure the pet is null again after the player died
       // Call Pet
       if (mPet == null) {
         switchActionBar(2);
         mKeyboard.type('5');
-        mPet = mPlayer.getPet();
         return false;
       }
       // Revive Pet
@@ -192,6 +186,19 @@ public class HunterSolver implements RotationSolver {
       }
     }
 
+    switchActionBar(1);
+    return true;
+  }
+
+  boolean isFullBuffed() {
+
+    // Aspect of the Money OR Aspect of the Hawk
+    if (mPlayerLevel >= 4 && !mPlayer.hasAura(mAspectOfTheMonkey) && !mPlayer.hasAura(mAspectOfTheHawk)) {
+      switchActionBar(2);
+      mKeyboard.type('7');
+      return false;
+    }
+    
     switchActionBar(1);
     return true;
   }
@@ -247,16 +254,18 @@ public class HunterSolver implements RotationSolver {
       if (!isFullBuffed()) {
         return;
       }
-      // Hunter's Mark
-      else if (mPlayerLevel >= 6 && !u.hasAura(mHuntersMark) && u.getDistance() < 40) {
-        mKeyboard.type('8');
-        return;
-      }
-      // Concussive Shot
-      else if (mPlayerLevel >= 8 && !u.hasAura(mConcussiveShot) && !mBot.anyOnCD(mConcussiveShot)
-          && u.getDistance() < 35) {
-        mKeyboard.type('1');
-        return;
+      else if(isPetAlive()){ // Only attack while walking if the pet is alive
+        // Hunter's Mark
+        if (mPlayerLevel >= 6 && !u.hasAura(mHuntersMark) && u.getDistance() < 40) {
+          mKeyboard.type('8');
+          return;
+        }
+        // Concussive Shot
+        else if (mPlayerLevel >= 8 && !u.hasAura(mConcussiveShot) && !mBot.anyOnCD(mConcussiveShot)
+            && u.getDistance() < 35) {
+          mKeyboard.type('1');
+          return;
+        }
       }
     }
   }
