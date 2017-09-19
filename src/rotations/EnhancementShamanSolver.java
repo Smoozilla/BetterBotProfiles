@@ -119,9 +119,8 @@ public class EnhancementShamanSolver implements RotationSolver {
 
   @Override
   public void pull(Unit u) {
-    if(!isFullBuffed(u.getDistance()))
-      mBot.sleep(400, 600);
-    combat(u);
+    if(isFullBuffed(u.getDistance()))
+      combat(u);
   }
 
   @Override

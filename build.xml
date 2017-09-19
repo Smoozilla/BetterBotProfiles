@@ -8,16 +8,13 @@
 		<delete dir="${build.dir}"/>
 	</target>
 	
-	<target name="compileAll">
+	<target name="expRotation">
 		<mkdir dir="${build.dir}"/>
 		<javac includeantruntime="false" srcdir="${src.dir}/rotations" destdir="${build.dir}" classpath="lib/libBetterBot.jar"/>
-	</target>
-	
-	<target name="createAllJars" depends="compileAll">
 		<mkdir dir="${dist.dir}"/>
-		<jar destfile="${dist.dir}/Rotations.jar" basedir="${build.dir}"/>
+		<jar basedir="${build.dir}" destfile="${dist.dir}/Rotations.jar"/>
 	</target>
-	
+		
 	<target name="expDruid">
 		<mkdir dir="${build.dir}"/>
 		<javac includeantruntime="false" srcdir="${src.dir}/rotations" includes="DruidSolver.java" destdir="${build.dir}" classpath="lib/libBetterBot.jar"/>
@@ -81,6 +78,6 @@
 		<jar basedir="${build.dir}" destfile="${dist.dir}/WarriorSolver.jar" includes="rotations/WarriorSolver.class"/>
 	</target>
 	
-	<target name="createAll" depends="createAllJars,expDruid,expHunter,expMage,expPaladin,expPriest,expRogue,expEnhShaman,expEleShaman,expWarrior"/>
+	<target name="createAll" depends="expRotation,expDruid,expHunter,expMage,expPaladin,expPriest,expRogue,expEnhShaman,expEleShaman,expWarrior"/>
 	
 </project>
