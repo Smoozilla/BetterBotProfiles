@@ -15,7 +15,7 @@ public class PaladinSolver implements RotationSolver {
 	BetterBot mBot;
 	Keyboard mKeyboard;
 	Unit mPlayer;
-	
+
 	float mDrinkPercent;
 	boolean mDrinking;
 	int mPlayerLevel;
@@ -31,10 +31,9 @@ public class PaladinSolver implements RotationSolver {
 	int mSealOfTheCrusader[] = { 21082, 20162, 20305, 20306, 20307, 20308 };
 	int mDevotionAura[] = { 465, 10290, 643, 10291, 1032, 10292, 10293 };
 	int mBlessingOfMight[] = { 19740, 19834, 19835, 19836, 19837, 19838, 25291 };
-	
+
 	// Debuffs
 	int mJudgementOfTheCrusader[] = { 21183, 20188, 20300, 20301, 20302, 20303 };
-	
 
 	// Drinking Buffs
 	int mDrinkingBuffs[] = { 430, 431, 432, 1133, 1135, 1137, 10250, 22734, 24355, 29007 };
@@ -58,77 +57,74 @@ public class PaladinSolver implements RotationSolver {
 			return;
 		}
 
-		float manaValue = mPlayer.getManaFloat();			
+		float manaValue = mPlayer.getManaFloat();
 		float targetDistance = u.getDistance();
 
 		// Player at good health
 		if (mPlayer.getHealthFloat() > 0.6f) {
-			
+
 			// ------ Low Level ------
-			if(mPlayerLevel < 6) {		
+			if (mPlayerLevel < 6) {
 				// Seal of Righteousness
-				if(u.getHealthFloat() > 0.2f && !mPlayer.hasAura(mSealOfRighteousness) && manaValue >= 0.1f) {
-					mKeyboard.type("2");
+				if (u.getHealthFloat() > 0.2f && !mPlayer.hasAura(mSealOfRighteousness) && manaValue >= 0.1f) {
+					mKeyboard.type('2');
 				}
 				// Judgement
-				else if(mPlayerLevel >= 4 && targetDistance <= 10 && mPlayer.hasAura(mSealOfRighteousness) && !mBot.anyOnCD(mSealOfRighteousness)){
-					mKeyboard.type("1");				
+				else if (mPlayerLevel >= 4 && targetDistance <= 10 && mPlayer.hasAura(mSealOfRighteousness)
+						&& !mBot.anyOnCD(mSealOfRighteousness)) {
+					mKeyboard.type('1');
 				}
 				// Melee Attack
 				else if (targetDistance <= 5) {
-					mKeyboard.type("7");
+					mKeyboard.type('7');
 				}
 				return;
 			}
 			// ------------------------
-			
-			
+
 			// Seal of the Crusader
-			if(!u.hasAura(mJudgementOfTheCrusader) && !mPlayer.hasAura(mSealOfTheCrusader) && manaValue >= 0.2f) {
-				mKeyboard.type("5");
+			if (!u.hasAura(mJudgementOfTheCrusader) && !mPlayer.hasAura(mSealOfTheCrusader) && manaValue >= 0.2f) {
+				mKeyboard.type('5');
 			}
 			// Judgement
-			else if(targetDistance <= 10 &&
-					((!u.hasAura(mJudgementOfTheCrusader) && mPlayer.hasAura(mSealOfTheCrusader)) ||
-					(u.hasAura(mJudgementOfTheCrusader) && mPlayer.hasAura(mSealOfRighteousness))) &&
-					!mBot.anyOnCD(mJudgement)) {
-				mKeyboard.type("1");
+			else if (targetDistance <= 10
+					&& ((!u.hasAura(mJudgementOfTheCrusader) && mPlayer.hasAura(mSealOfTheCrusader))
+							|| (u.hasAura(mJudgementOfTheCrusader) && mPlayer.hasAura(mSealOfRighteousness)))
+					&& !mBot.anyOnCD(mJudgement)) {
+				mKeyboard.type('1');
 			}
 			// Seal of Righteousness
-			else if(u.hasAura(mJudgementOfTheCrusader) && !mPlayer.hasAura(mSealOfRighteousness) && manaValue >= 0.1f) {
-				mKeyboard.type("2");
+			else if (u.hasAura(mJudgementOfTheCrusader) && !mPlayer.hasAura(mSealOfRighteousness) && manaValue >= 0.1f) {
+				mKeyboard.type('2');
 			}
 			// Melee Attack
 			else if (targetDistance <= 5) {
-				mKeyboard.type("7");
-			}					
+				mKeyboard.type('7');
+			}
 		}
 		// Player below 60% Health
 		else {
 			// Lay on Hands
-			if(mPlayerLevel >= 10 && mPlayer.getHealthFloat() <= 0.1f && !mBot.anyOnCD(mLayOnHands)) {
-				mKeyboard.type("8");
+			if (mPlayerLevel >= 10 && mPlayer.getHealthFloat() <= 0.1f && !mBot.anyOnCD(mLayOnHands)) {
+				mKeyboard.type('8');
 			}
 			// Hammer of Justice
-			if(mPlayerLevel >= 8 && targetDistance <= 10 && !mBot.anyOnCD(mHammerOfJustice) && manaValue >= 0.2f) {
-				mKeyboard.type("9");
+			if (mPlayerLevel >= 8 && targetDistance <= 10 && !mBot.anyOnCD(mHammerOfJustice) && manaValue >= 0.2f) {
+				mKeyboard.type('9');
 			}
 			// Holy Light
 			if (manaValue >= 0.2f) {
-				mKeyboard.type("3");
+				mKeyboard.type('3');
 			}
 		}
 	}
 
 	@Override
 	public void pull(Unit u) {
-		if (!isFullBuffed())
-			return;
-		
 		// Judgement
-		if(mPlayerLevel >= 4 && !mBot.anyOnCD(mJudgement))
-			mKeyboard.type("1");
-				
+		if (mPlayerLevel >= 4 && !mBot.anyOnCD(mJudgement))
+			mKeyboard.type('1');
+
 		combat(u);
 	}
 
@@ -142,22 +138,28 @@ public class PaladinSolver implements RotationSolver {
 		return false;
 	}
 
-	boolean isFullBuffed() {		
-		
+	boolean isFullBuffed(float distance) {
+
 		// Blessing of Might
-		if(mPlayerLevel >= 4 && !mPlayer.hasAura(mBlessingOfMight)) {
-			mKeyboard.type("-");
+		if (mPlayerLevel >= 4 && !mPlayer.hasAura(mBlessingOfMight)) {
+			mKeyboard.type('-');
 			return false;
 		}
 		// Devotion Aura
-		if(!mPlayer.hasAura(mDevotionAura)) {
-			mKeyboard.type("=");
+		if (!mPlayer.hasAura(mDevotionAura)) {
+			mKeyboard.type('=');
 			return false;
 		}
 		// Seal of the Crusader
-		if(mPlayerLevel >= 6 && !mPlayer.hasAura(mSealOfTheCrusader)) {
-			mKeyboard.type("5");
+		if (mPlayerLevel >= 6 && distance < 15 && !mPlayer.hasAura(mSealOfTheCrusader)) {
+			mKeyboard.type('5');
+			return false;
 		}
+		// Seal of Righteousness
+		if(mPlayerLevel < 6 && distance < 10 && !mPlayer.hasAura(mSealOfRighteousness)){
+			mKeyboard.type('2');
+		}
+
 		return true;
 	}
 
@@ -170,20 +172,31 @@ public class PaladinSolver implements RotationSolver {
 			mKeyboard.type('0'); // drink bind
 			mBot.sleep(1200, 1700); // prevent double drinking
 		}
-		
+
 		if (mDrinking && mPlayer.getManaFloat() > 0.9f) {
 			// over 90% mana, good enough
-			mKeyboard.type("w"); // force to be standing
+			mKeyboard.type('w'); // force to be standing
 			mDrinking = false;
 		}
 	}
 
 	@Override
 	public int getPullDistance(Unit u) {
+		if (mPlayerLevel < 4)
+			return 5;
 		return 10;
 	}
 
-  @Override
-  public void approaching(Unit u) {    
-  }
+	long waitFlag = System.currentTimeMillis();
+
+	@Override
+	public void approaching(Unit u) {
+
+		long now = System.currentTimeMillis();
+		// Slow dooooown!
+		if (now - waitFlag > 500) {
+			waitFlag = now;
+			isFullBuffed(u.getDistance());
+		}
+	}
 }
