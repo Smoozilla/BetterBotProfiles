@@ -33,6 +33,7 @@ public class HunterSolver implements RotationSolver {
   int mArcaneShot[] = { 3044, 14281, 14282, 14283, 14284, 14285, 14286, 14287 };
   int mConcussiveShot = 5116;
   int mMongooseBite[] = { 1495, 14269, 14270, 14271 };
+  int mDisengage[] = { 781, 14272, 14273 };
 
   // Buffs
   int mAspectOfTheMonkey = 13163;
@@ -135,8 +136,18 @@ public class HunterSolver implements RotationSolver {
       //if(mPlayerLevel >= 16 && !mBot.anyOnCD(mMongooseBite)) {
       //  mKeyboard.type('5');
       //}
-      // Raptor Strike else
-      if (!mBot.anyOnCD(mRaptorStrike) && manaValue >= 0.15f) {
+      // Aspect of the Monkey with dead pet
+      if(mPet != null && mPet.isDead() && !mPlayer.hasAura(mAspectOfTheMonkey)){
+        switchActionBar(2);
+        mKeyboard.type('8');
+        switchActionBar(1);
+      }
+      // Disengage
+      else if(mPlayerLevel >= 20 && u.getTarget() == mPlayer.getGUID() && mPet != null && !mPet.isDead() && !mBot.anyOnCD(mDisengage)){
+        mKeyboard.type('-');
+      }
+      // Raptor Strike
+      else if (!mBot.anyOnCD(mRaptorStrike) && manaValue >= 0.15f) {
         mKeyboard.type('2');
       }
       // Auto Attack
@@ -192,13 +203,18 @@ public class HunterSolver implements RotationSolver {
 
   boolean isFullBuffed() {
 
-    // Aspect of the Money OR Aspect of the Hawk
-    if (mPlayerLevel >= 4 && !mPlayer.hasAura(mAspectOfTheMonkey) && !mPlayer.hasAura(mAspectOfTheHawk)) {
+    if(mPlayerLevel >= 10 && !mPlayer.hasAura(mAspectOfTheHawk)){
       switchActionBar(2);
       mKeyboard.type('7');
       return false;
     }
-    
+    // Aspect of the Money OR Aspect of the Hawk
+    else if (mPlayerLevel >= 4 && !mPlayer.hasAura(mAspectOfTheMonkey)) {
+      switchActionBar(2);
+      mKeyboard.type('8');
+      return false;
+    }
+        
     switchActionBar(1);
     return true;
   }
@@ -254,7 +270,7 @@ public class HunterSolver implements RotationSolver {
       if (!isFullBuffed()) {
         return;
       }
-      else if(isPetAlive()){ // Only attack while walking if the pet is alive
+      else if(mPet != null && !mPet.isDead()){ // Only attack while walking if the pet is alive
         // Hunter's Mark
         if (mPlayerLevel >= 6 && !u.hasAura(mHuntersMark) && u.getDistance() < 40) {
           mKeyboard.type('8');
