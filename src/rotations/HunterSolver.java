@@ -159,7 +159,7 @@ public class HunterSolver implements RotationSolver {
 
   @Override
   public void pull(Unit u) {
-    if(isPetAlive())
+    if(isPetAliveAndWell())
       combat(u);
   }
 
@@ -176,7 +176,7 @@ public class HunterSolver implements RotationSolver {
     return false;
   }
 
-  boolean isPetAlive() {
+  boolean isPetAliveAndWell() {
     
     if (mPlayer.isCasting())
       return false;
@@ -195,6 +195,12 @@ public class HunterSolver implements RotationSolver {
         mKeyboard.type('6');
         return false;
       }
+      // Mend Pet
+      else if (mPet.getHealthFloat() <= 0.6f) {
+        switchActionBar(2);
+        mKeyboard.type('4');
+        return false;
+      }
     }
 
     switchActionBar(1);
@@ -209,7 +215,7 @@ public class HunterSolver implements RotationSolver {
       return false;
     }
     // Aspect of the Money OR Aspect of the Hawk
-    else if (mPlayerLevel >= 4 && !mPlayer.hasAura(mAspectOfTheMonkey)) {
+    else if (mPlayerLevel >= 4 && mPlayerLevel < 10 && !mPlayer.hasAura(mAspectOfTheMonkey)) {
       switchActionBar(2);
       mKeyboard.type('8');
       return false;
