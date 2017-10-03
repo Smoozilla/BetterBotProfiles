@@ -56,7 +56,7 @@ public class RogueSolver implements RotationSolver {
 
 		// Kick
 		if (mPlayerLevel >= 12 && u.isCasting() && !mBot.anyOnCD(mKick)) {
-			mKeyboard.type('1');
+			mKeyboard.type('6');
 		}
 
 		// Evasion
