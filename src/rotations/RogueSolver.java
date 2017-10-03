@@ -16,8 +16,7 @@ public class RogueSolver implements RotationSolver {
 	BetterBot mBot;
 	Keyboard mKeyboard;
 	Unit mPlayer;
-	Movement mMove;
-	
+
 	float mEatPercent;
 	boolean mEating;
 	int mPlayerLevel;
@@ -25,6 +24,7 @@ public class RogueSolver implements RotationSolver {
 	// Everything sorted by rank!
 	// Spells
 	int mKick[] = { 1766, 1767, 1768, 1769 };
+	int mSliceAndDice[] = { 5171, 6774 };
 
 	// Buffs
 	int mStealth[] = { 1784, 1785, 1786, 1787 };
@@ -38,8 +38,7 @@ public class RogueSolver implements RotationSolver {
 		mPlayer = bot.getPlayer();
 		mKeyboard = bot.getKeyboard();
 		mPlayerLevel = mPlayer.getLevel();
-		mMove = bot.getMovement();		
-		
+
 		System.out.println("TheCrux's Rogue script started");
 
 		mEatPercent = 0.65f; // Eat if below 65% health
@@ -48,62 +47,54 @@ public class RogueSolver implements RotationSolver {
 
 	@Override
 	public void combat(Unit u) {
-	
+
 		int energyValue = mPlayer.getEnergy();
-		int comboPoints = 0;
+		int comboPoints = mBot.getComboPoints();
 
 		float targetDistance = u.getDistance();
 		float targetHealth = u.getHealthFloat();
-		
+
 		// Kick
-		if(mPlayerLevel >= 12 && u.isCasting() && !mBot.anyOnCD(mKick)) {
-		  mKeyboard.type('1');
+		if (mPlayerLevel >= 12 && u.isCasting() && !mBot.anyOnCD(mKick)) {
+			mKeyboard.type('1');
 		}
-		
+
 		// Evasion
-		if(mPlayerLevel >= 8 && mPlayer.getHealthFloat() <= 0.5f && !mPlayer.hasAura(mEvasion)) {
-			mKeyboard.type('9');
+		if (mPlayerLevel >= 8 && mPlayer.getHealthFloat() <= 0.5f && !mPlayer.hasAura(mEvasion)
+				&& !mBot.anyOnCD(mEvasion)) {
+			mKeyboard.type('8');
 		}
-		
-		if(targetDistance <= 5) {			
-			if(energyValue >= 35 && (
-					//(comboPoints == 1 && targetHealth <= 0.1f) ||
-					//(comboPoints == 2 && targetHealth <= 0.15f) ||
-					(comboPoints == 3 && targetHealth <= 0.1f) ||
-					(comboPoints == 4 && targetHealth <= 0.15f) ||
-					comboPoints == 5)) {
+
+		if (targetDistance <= 5) {
+			// Slice and Dice
+			if (energyValue >= 25 && !mPlayer.hasAura(mSliceAndDice)
+					&& ((comboPoints == 1 && targetHealth <= 0.1f) || (comboPoints == 2 && targetHealth <= 0.15f)
+							|| (comboPoints == 3 && targetHealth <= 0.2f) || (comboPoints == 4 && targetHealth <= 0.25f)
+							|| comboPoints == 5)) {
 				mKeyboard.type('3');
 			}
+			// Eviscerate		
+			else if (energyValue >= 35 && ((comboPoints == 1 && targetHealth <= 0.1f)
+					|| (comboPoints == 2 && targetHealth <= 0.15f) || (comboPoints == 3 && targetHealth <= 0.2f)
+					|| (comboPoints == 4 && targetHealth <= 0.25f) || comboPoints == 5)) {
+				mKeyboard.type('2');
+			}
 			// Sinister Strike OR Hemorrhage
-			else if(energyValue >= 45) {
+			else if (energyValue >= 45) {
 				mKeyboard.type('4');
 			}
 			// Melee Attack
 			else {
 				mKeyboard.type('7');
-			}			
+			}
 		}
 	}
 
 	@Override
-	public void pull(Unit u) {		
-		// Stealth
-		if(mPlayerLevel >= 2 &&  !mPlayer.hasAura(mStealth) && !mBot.anyOnCD(mStealth)) {
-			mKeyboard.type('0');
-		}
-				
-		if(u.getDistance() > 5) {
-		  mMove.walkTo(u, 4f);
-		  return;
-		}
-		else {
-		  // Cheap Shot
-		  if(mPlayerLevel >= 26) {
-		    mKeyboard.type('1');
-		  }
-		}
-		
-		
+	public void pull(Unit u) {
+
+		// Try to Backstap / Ambush
+		mKeyboard.type("3");
 		combat(u);
 	}
 
@@ -112,20 +103,20 @@ public class RogueSolver implements RotationSolver {
 		eat();
 		if (mEating)
 			return true;
-		
+
 		return false;
 	}
 
-	void eat() {		
-		
-		if(mPlayer.getHealthFloat() < mEatPercent)
+	void eat() {
+
+		if (mPlayer.getHealthFloat() < mEatPercent)
 			mEating = true;
 
 		if (mEating && !mPlayer.hasAura(mEatingBuffs) && mPlayer.getHealthFloat() < mEatPercent + 0.05f) {
-			mKeyboard.type('-'); // eat bind
+			mKeyboard.type('0'); // eat bind
 			mBot.sleep(1200, 1700); // prevent double eating
 		}
-		
+
 		if (mEating && mPlayer.getHealthFloat() > 0.9f) {
 			// over 90% health, good enough
 			mKeyboard.type('w'); // force to be standing
@@ -135,10 +126,26 @@ public class RogueSolver implements RotationSolver {
 
 	@Override
 	public int getPullDistance(Unit u) {
-		return 30;
+		return 5;
 	}
 
-  @Override
-  public void approaching(Unit u) {    
-  }
+	long waitFlag = System.currentTimeMillis();
+
+	@Override
+	public void approaching(Unit u) {
+		long now = System.currentTimeMillis();
+		// Slow dooooown!
+		if (now - waitFlag > 500 && u.getDistance() < 25) {
+			waitFlag = now;
+
+			// Stealth
+			if (mPlayerLevel >= 2 && !mPlayer.hasAura(mStealth) && !mBot.anyOnCD(mStealth)) {
+				mKeyboard.type('9');
+			}
+			// Cheap Shot
+			if (mPlayerLevel >= 26 && u.getDistance() <= 5) {
+				mKeyboard.type('1');
+			}
+		}
+	}
 }
