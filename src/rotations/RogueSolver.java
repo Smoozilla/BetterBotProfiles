@@ -67,10 +67,7 @@ public class RogueSolver implements RotationSolver {
 
 		if (targetDistance <= 5) {
 			// Slice and Dice
-			if (energyValue >= 25 && !mPlayer.hasAura(mSliceAndDice)
-					&& ((comboPoints == 1 && targetHealth <= 0.1f) || (comboPoints == 2 && targetHealth <= 0.15f)
-							|| (comboPoints == 3 && targetHealth <= 0.2f) || (comboPoints == 4 && targetHealth <= 0.25f)
-							|| comboPoints == 5)) {
+			if (energyValue >= 25 && !mPlayer.hasAura(mSliceAndDice) && comboPoints > 0) {
 				mKeyboard.type('3');
 			}
 			// Eviscerate		
