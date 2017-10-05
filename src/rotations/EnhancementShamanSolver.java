@@ -32,7 +32,7 @@ public class EnhancementShamanSolver implements RotationSolver {
 
   // Totem Buffs
   int mStrengthOfEarthTotem[] = { 8076, 8162, 8163, 10441, 25362 };
-  int mHealingStreamTotem[] = { 5672, 6371, 6372, 10460, 10461 };
+  //int mHealingStreamTotem[] = { 5672, 6371, 6372, 10460, 10461 };
 
   // Totem Names
   String mSearingTotem[] = { "Searing Totem", "Searing Totem II", "Searing Totem III", "Searing Totem IV",
@@ -70,6 +70,11 @@ public class EnhancementShamanSolver implements RotationSolver {
       float targetHealth = u.getHealthFloat();
 
       if (targetDistance < 20) {
+
+        // Make sure Strength of Earth Totem is up
+        if (!mPlayer.hasAura(mStrengthOfEarthTotem) && targetDistance <= 10 && targetHealth > 0.3f) {
+          mKeyboard.type('8');
+        }
 
         if (targetDistance <= 5) {
           // Stormstrike
@@ -119,7 +124,7 @@ public class EnhancementShamanSolver implements RotationSolver {
 
   @Override
   public void pull(Unit u) {
-    if(isFullBuffed(u.getDistance()))
+    if (isFullBuffed(u.getDistance()))
       combat(u);
   }
 
@@ -177,8 +182,16 @@ public class EnhancementShamanSolver implements RotationSolver {
     return 30;
   }
 
+  long waitFlag = System.currentTimeMillis();
+
   @Override
   public void approaching(Unit u) {
-    isFullBuffed(u.getDistance());
+    
+    long now = System.currentTimeMillis();
+    // Slow dooooown!
+    if (now - waitFlag > 500) {
+      waitFlag = now;
+      isFullBuffed(u.getDistance());
+    }
   }
 }
