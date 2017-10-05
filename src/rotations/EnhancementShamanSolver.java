@@ -72,7 +72,8 @@ public class EnhancementShamanSolver implements RotationSolver {
       if (targetDistance < 20) {
 
         // Make sure Strength of Earth Totem is up
-        if (!mPlayer.hasAura(mStrengthOfEarthTotem) && targetDistance <= 10 && targetHealth > 0.3f) {
+        if (!mPlayer.hasAura(mStrengthOfEarthTotem) && targetDistance <= 10 && targetHealth > 0.3f
+            && manaValue > 0.15f) {
           mKeyboard.type('8');
         }
 
@@ -124,7 +125,19 @@ public class EnhancementShamanSolver implements RotationSolver {
 
   @Override
   public void pull(Unit u) {
-    if (isFullBuffed(u.getDistance()))
+    if (mPlayer.getManaFloat() < mDrinkPercent) {
+      drink();
+    }
+    // Heal yourself
+    else if (mPlayer.getHealthFloat() < 0.85f) {
+      mKeyboard.type('3');
+    }
+    // Searing Totem
+    else if (mBot.getNPCs(mSearingTotem).size() == 0) {
+      mKeyboard.type('9');
+    }
+    // Buff up
+    else if (isFullBuffed(u.getDistance()))
       combat(u);
   }
 
@@ -149,7 +162,7 @@ public class EnhancementShamanSolver implements RotationSolver {
       return false;
     }
     // Strength of Earth Totem
-    if (mPlayerLevel >= 10 && distToTarget < 20 && !mPlayer.hasAura(mStrengthOfEarthTotem)
+    if (mPlayerLevel >= 10 && distToTarget < 35 && !mPlayer.hasAura(mStrengthOfEarthTotem)
         && mPlayer.getManaFloat() > 0.15f) {
       mKeyboard.type('8');
       return false;
@@ -186,7 +199,7 @@ public class EnhancementShamanSolver implements RotationSolver {
 
   @Override
   public void approaching(Unit u) {
-    
+
     long now = System.currentTimeMillis();
     // Slow dooooown!
     if (now - waitFlag > 500) {

@@ -6,7 +6,7 @@ import com.betterbot.api.pub.Unit;
 import com.betterbot.api.pub.RotationSolver;
 
 /**
- * This rotation is for the Enhancement spec. You have to skill Stormstrike on level 40!
+ * This rotation is for the Elemental spec.
  * @author TheCrux
  */
 
@@ -68,38 +68,38 @@ public class ElementalShamanSolver implements RotationSolver {
       float targetDistance = u.getDistance();
       float targetHealth = u.getHealthFloat();
 
-
-      if(mPlayerLevel >= 4 && targetDistance < 20){
+      if (mPlayerLevel >= 4 && targetDistance < 20) {
         // Flame Shock
-        if(mPlayerLevel >= 10 && targetHealth >= 0.3f){
-          if(!u.hasAura(mFlameShock) && !mBot.anyOnCD(mFlameShock) && !mBot.anyOnCD(mEarthShock) && targetHealth >= 0.15f && manaValue >= 0.15f){
+        if (mPlayerLevel >= 10 && targetHealth >= 0.3f) {
+          if (!u.hasAura(mFlameShock) && !mBot.anyOnCD(mFlameShock) && !mBot.anyOnCD(mEarthShock)
+              && targetHealth >= 0.15f && manaValue >= 0.15f) {
             mKeyboard.type('2');
           }
           // Searing Totem
-          else if(mBot.getNPCs(mSearingTotem).size() == 0){
+          else if (mBot.getNPCs(mSearingTotem).size() == 0) {
             mKeyboard.type('9');
           }
           // Earth Shock
-          else if(!mBot.anyOnCD(mEarthShock) && targetHealth >= 0.15f && manaValue >= 0.15f){
+          else if (!mBot.anyOnCD(mEarthShock) && targetHealth >= 0.15f && manaValue >= 0.15f) {
             mKeyboard.type('1');
           }
         }
         // Earth Shock
-        else if(!mBot.anyOnCD(mEarthShock) && targetHealth >= 0.15f && manaValue >= 0.15f){
+        else if (!mBot.anyOnCD(mEarthShock) && targetHealth >= 0.15f && manaValue >= 0.15f) {
           mKeyboard.type('1');
         }
       }
 
       // Chain Lightning
-      if(mBot.getAttackers().size() > 2 && manaValue >= 0.2f){
+      if (mBot.getAttackers().size() > 2 && manaValue >= 0.2f) {
         mKeyboard.type('5');
       }
       // Lightning Bolt
-      else if(manaValue >= 0.08f){
+      else if (manaValue >= 0.08f) {
         mKeyboard.type('4');
       }
       // Auto Attack
-      else{
+      else {
         mKeyboard.type('7');
       }
     }
@@ -114,14 +114,21 @@ public class ElementalShamanSolver implements RotationSolver {
 
   @Override
   public void pull(Unit u) {
-    if(!isFullBuffed(u.getDistance()))
-      mBot.sleep(400, 600);
-
+    if (mPlayer.getManaFloat() < mDrinkPercent) {
+      drink();
+    }
+    // Heal yourself
+    else if (mPlayer.getHealthFloat() < 0.85f) {
+      mKeyboard.type('3');
+    }
     // Searing Totem
-    if(mBot.getNPCs(mSearingTotem).size() == 0)
+    else if (mBot.getNPCs(mSearingTotem).size() == 0) {
       mKeyboard.type('9');
-    
-    combat(u);
+    }
+    // Buff up
+    else if (isFullBuffed(u.getDistance())) {
+      combat(u);
+    }
   }
 
   @Override
@@ -145,8 +152,7 @@ public class ElementalShamanSolver implements RotationSolver {
       return false;
     }
     // Stoneskin Totem
-    if (mPlayerLevel >= 4 && distToTarget < 20 && !mPlayer.hasAura(mStoneskinTotem)
-        && mPlayer.getManaFloat() > 0.15f) {
+    if (mPlayerLevel >= 4 && distToTarget < 20 && !mPlayer.hasAura(mStoneskinTotem) && mPlayer.getManaFloat() > 0.15f) {
       mKeyboard.type('8');
       return false;
     }
@@ -178,8 +184,16 @@ public class ElementalShamanSolver implements RotationSolver {
     return 30;
   }
 
+  long waitFlag = System.currentTimeMillis();
+
   @Override
   public void approaching(Unit u) {
-    isFullBuffed(u.getDistance());
+
+    long now = System.currentTimeMillis();
+    // Slow dooooown!
+    if (now - waitFlag > 500) {
+      waitFlag = now;
+      isFullBuffed(u.getDistance());
+    }
   }
 }
