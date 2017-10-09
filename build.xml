@@ -29,6 +29,13 @@
 		<jar basedir="${build.dir}" destfile="${dist.dir}/HunterSolver.jar" includes="rotations/HunterSolver.class"/>
 	</target>	
 	
+	<target name="expHunterBeast" depends="clean">
+		<mkdir dir="${build.dir}"/>
+		<javac includeantruntime="false" srcdir="${src.dir}/rotations" includes="HunterBeastSolver.java" destdir="${build.dir}" classpath="lib/libBetterBot.jar"/>
+		<mkdir dir="${dist.dir}"/>
+		<jar basedir="${build.dir}" destfile="${dist.dir}/HunterBeastSolver.jar" includes="rotations/HunterBeastSolver.class"/>
+	</target>	
+	
 	<target name="expMage">
 		<mkdir dir="${build.dir}"/>
 		<javac includeantruntime="false" srcdir="${src.dir}/rotations" includes="MageSolver.java" destdir="${build.dir}" classpath="lib/libBetterBot.jar"/>
@@ -57,18 +64,18 @@
 		<jar basedir="${build.dir}" destfile="${dist.dir}/RogueSolver.jar" includes="rotations/RogueSolver.class"/>
 	</target>
 	
-	<target name="expEnhShaman">
+	<target name="expShamanEnh">
 		<mkdir dir="${build.dir}"/>
-		<javac includeantruntime="false" srcdir="${src.dir}/rotations" includes="EnhancementShamanSolver.java" destdir="${build.dir}" classpath="lib/libBetterBot.jar"/>
+		<javac includeantruntime="false" srcdir="${src.dir}/rotations" includes="ShamanEnhancementSolver.java" destdir="${build.dir}" classpath="lib/libBetterBot.jar"/>
 		<mkdir dir="${dist.dir}"/>
-		<jar basedir="${build.dir}" destfile="${dist.dir}/EnhancementShamanSolver.jar" includes="rotations/EnhancementShamanSolver.class"/>
+		<jar basedir="${build.dir}" destfile="${dist.dir}/ShamanEnhancementSolver.jar" includes="rotations/ShamanEnhancementSolver.class"/>
 	</target>
 
-	<target name="expEleShaman">
+	<target name="expShamanEle">
 		<mkdir dir="${build.dir}"/>
-		<javac includeantruntime="false" srcdir="${src.dir}/rotations" includes="ElementalShamanSolver.java" destdir="${build.dir}" classpath="lib/libBetterBot.jar"/>
+		<javac includeantruntime="false" srcdir="${src.dir}/rotations" includes="ShamanElementalSolver.java" destdir="${build.dir}" classpath="lib/libBetterBot.jar"/>
 		<mkdir dir="${dist.dir}"/>
-		<jar basedir="${build.dir}" destfile="${dist.dir}/ElementalShamanSolver.jar" includes="rotations/ElementalShamanSolver.class"/>
+		<jar basedir="${build.dir}" destfile="${dist.dir}/ShamanElementalSolver.jar" includes="rotations/ShamanElementalSolver.class"/>
 	</target>
 	
 	<target name="expWarrior">
@@ -78,6 +85,6 @@
 		<jar basedir="${build.dir}" destfile="${dist.dir}/WarriorSolver.jar" includes="rotations/WarriorSolver.class"/>
 	</target>
 	
-	<target name="createAll" depends="expRotation,expDruid,expHunter,expMage,expPaladin,expPriest,expRogue,expEnhShaman,expEleShaman,expWarrior"/>
+	<target name="createAll" depends="expRotation,expDruid,expHunter,expHunterBeast,expMage,expPaladin,expPriest,expRogue,expShamanEnh,expShamanEle,expWarrior"/>
 	
 </project>

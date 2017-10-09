@@ -6,11 +6,11 @@ import com.betterbot.api.pub.Unit;
 import com.betterbot.api.pub.RotationSolver;
 
 /**
- * This rotation is for the Elemental spec.
+ * This rotation is for the Enhancement spec. You have to skill Stormstrike on level 40!
  * @author TheCrux
  */
 
-public class ElementalShamanSolver implements RotationSolver {
+public class ShamanEnhancementSolver implements RotationSolver {
 
   BetterBot mBot;
   Keyboard mKeyboard;
@@ -25,13 +25,14 @@ public class ElementalShamanSolver implements RotationSolver {
   // Spells
   int mFlameShock[] = { 8050, 8052, 8053, 10447, 10448, 29228 };
   int mEarthShock[] = { 8042, 8044, 8045, 8046, 10412, 10413, 10414 };
+  int mStormstrike = 17364;
 
   // Buffs
   int mLightningShield[] = { 324, 325, 905, 945, 8134, 10431, 10432 };
 
   // Totem Buffs
-  int mStoneskinTotem[] = { 8071, 8154, 8155, 10406, 10407, 10408 };
-  int mHealingStreamTotem[] = { 5672, 6371, 6372, 10460, 10461 };
+  int mStrengthOfEarthTotem[] = { 8076, 8162, 8163, 10441, 25362 };
+  //int mHealingStreamTotem[] = { 5672, 6371, 6372, 10460, 10461 };
 
   // Totem Names
   String mSearingTotem[] = { "Searing Totem", "Searing Totem II", "Searing Totem III", "Searing Totem IV",
@@ -40,13 +41,13 @@ public class ElementalShamanSolver implements RotationSolver {
   // Drinking Buffs
   int mDrinkingBuffs[] = { 430, 431, 432, 1133, 1135, 1137, 10250, 22734, 24355, 29007 };
 
-  public ElementalShamanSolver(BetterBot bot) {
+  public ShamanEnhancementSolver(BetterBot bot) {
     mBot = bot;
     mPlayer = bot.getPlayer();
     mKeyboard = bot.getKeyboard();
     mPlayerLevel = mPlayer.getLevel();
 
-    System.out.println("TheCrux's Elemental Shaman script started");
+    System.out.println("TheCrux's Enhancement Shaman script started");
 
     mDrinkPercent = 0.4f; // drink if below 40% mana
     mDrinking = false;
@@ -68,39 +69,49 @@ public class ElementalShamanSolver implements RotationSolver {
       float targetDistance = u.getDistance();
       float targetHealth = u.getHealthFloat();
 
-      if (mPlayerLevel >= 4 && targetDistance < 20) {
-        // Flame Shock
-        if (mPlayerLevel >= 10 && targetHealth >= 0.3f) {
+      if (targetDistance < 20) {
+
+        // Make sure Strength of Earth Totem is up
+        if (!mPlayer.hasAura(mStrengthOfEarthTotem) && targetDistance <= 10 && targetHealth > 0.3f
+            && manaValue > 0.15f) {
+          mKeyboard.type('8');
+        }
+
+        if (targetDistance <= 5) {
+          // Stormstrike
+          if (mPlayerLevel >= 40 && targetDistance <= 5 && !mBot.anyOnCD(mStormstrike) && targetHealth > 0.1f
+              && manaValue > 0.3f) {
+            mKeyboard.type('5');
+          }
+          // Auto Attack
+          else {
+            mKeyboard.type('7');
+          }
+        }
+
+        if (mPlayerLevel >= 10 && targetHealth > 0.3f && manaValue > 0.15f) {
+          // Flame Shock
           if (!u.hasAura(mFlameShock) && !mBot.anyOnCD(mFlameShock) && !mBot.anyOnCD(mEarthShock)
-              && targetHealth >= 0.15f && manaValue >= 0.15f) {
+              && (mPlayerLevel < 40 || (mBot.anyOnCD(mStormstrike) && !u.hasAura(mStormstrike)))) {
             mKeyboard.type('2');
           }
           // Searing Totem
-          else if (mBot.getNPCs(mSearingTotem).size() == 0) {
+          else if (mBot.getNPCs(mSearingTotem).size() == 0 && targetHealth > 0.5f) {
             mKeyboard.type('9');
-          }
-          // Earth Shock
-          else if (!mBot.anyOnCD(mEarthShock) && targetHealth >= 0.15f && manaValue >= 0.15f) {
-            mKeyboard.type('1');
           }
         }
         // Earth Shock
-        else if (!mBot.anyOnCD(mEarthShock) && targetHealth >= 0.15f && manaValue >= 0.15f) {
+        if (mPlayerLevel >= 4 && !mBot.anyOnCD(mEarthShock) && manaValue > 0.15f) {
+          if (mPlayerLevel >= 10 && mPlayerLevel < 40 && mBot.anyOnCD(mFlameShock))
+            return;
+          if (mPlayerLevel >= 40 && !u.hasAura(mStormstrike))
+            return;
           mKeyboard.type('1');
         }
       }
-
-      // Chain Lightning
-      if (mBot.getAttackers().size() > 2 && manaValue >= 0.2f) {
-        mKeyboard.type('5');
-      }
       // Lightning Bolt
-      else if (manaValue >= 0.08f) {
-        mKeyboard.type('4');
-      }
-      // Auto Attack
       else {
-        mKeyboard.type('7');
+        mKeyboard.type('4');
       }
     }
     // Player below 60% Health
@@ -126,9 +137,8 @@ public class ElementalShamanSolver implements RotationSolver {
       mKeyboard.type('9');
     }
     // Buff up
-    else if (isFullBuffed(u.getDistance())) {
+    else if (isFullBuffed(u.getDistance()))
       combat(u);
-    }
   }
 
   @Override
@@ -151,8 +161,9 @@ public class ElementalShamanSolver implements RotationSolver {
       mKeyboard.type('6');
       return false;
     }
-    // Stoneskin Totem
-    if (mPlayerLevel >= 4 && distToTarget < 20 && !mPlayer.hasAura(mStoneskinTotem) && mPlayer.getManaFloat() > 0.15f) {
+    // Strength of Earth Totem
+    if (mPlayerLevel >= 10 && distToTarget < 35 && !mPlayer.hasAura(mStrengthOfEarthTotem)
+        && mPlayer.getManaFloat() > 0.15f) {
       mKeyboard.type('8');
       return false;
     }

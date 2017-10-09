@@ -34,6 +34,8 @@ public class HunterSolver implements RotationSolver {
   int mConcussiveShot = 5116;
   int mMongooseBite[] = { 1495, 14269, 14270, 14271 };
   int mDisengage[] = { 781, 14272, 14273 };
+  int mRapidFire = 3045;
+  int mFeignDeath = 5384;
 
   // Buffs
   int mAspectOfTheMonkey = 13163;
@@ -77,7 +79,7 @@ public class HunterSolver implements RotationSolver {
   @Override
   public void combat(Unit u) {
     switchActionBar(1);
-    
+
     // Make sure the pet is attacked and not the player
     if (mPlayerLevel >= 10) {
       List<Unit> attackers = mBot.getAttackers();
@@ -90,6 +92,12 @@ public class HunterSolver implements RotationSolver {
             mKeyboard.release(KeyEvent.VK_CONTROL);
             break;
           }
+        }
+        // Rapid Fire
+        if (mPlayerLevel >= 26 && !mBot.anyOnCD(mRapidFire)) {
+          switchActionBar(2);
+          mKeyboard.type('-');
+          return;
         }
       }
     }
@@ -137,13 +145,19 @@ public class HunterSolver implements RotationSolver {
       //  mKeyboard.type('5');
       //}
       // Aspect of the Monkey with dead pet
-      if(mPet != null && mPet.isDead() && !mPlayer.hasAura(mAspectOfTheMonkey)){
+      if (mPet != null && mPet.isDead() && !mPlayer.hasAura(mAspectOfTheMonkey)) {
         switchActionBar(2);
         mKeyboard.type('8');
         switchActionBar(1);
       }
+      // Feign Death
+      else if (mPlayerLevel >= 30 && u.getTarget() == mPlayer.getGUID() && mPet != null && !mPet.isDead()
+          && !mBot.anyOnCD(mFeignDeath)) {
+        mKeyboard.type('6');
+      }
       // Disengage
-      else if(mPlayerLevel >= 20 && u.getTarget() == mPlayer.getGUID() && mPet != null && !mPet.isDead() && !mBot.anyOnCD(mDisengage)){
+      else if (mPlayerLevel >= 20 && u.getTarget() == mPlayer.getGUID() && mPet != null && !mPet.isDead()
+          && !mBot.anyOnCD(mDisengage)) {
         mKeyboard.type('-');
       }
       // Raptor Strike
@@ -154,12 +168,12 @@ public class HunterSolver implements RotationSolver {
       else {
         mKeyboard.type('7');
       }
-    }    
+    }
   }
 
   @Override
   public void pull(Unit u) {
-    if(isPetAliveAndWell())
+    if (isPetAliveAndWell())
       combat(u);
   }
 
@@ -177,7 +191,7 @@ public class HunterSolver implements RotationSolver {
   }
 
   boolean isPetAliveAndWell() {
-    
+
     if (mPlayer.isCasting())
       return false;
 
@@ -209,7 +223,7 @@ public class HunterSolver implements RotationSolver {
 
   boolean isFullBuffed() {
 
-    if(mPlayerLevel >= 10 && !mPlayer.hasAura(mAspectOfTheHawk)){
+    if (mPlayerLevel >= 10 && !mPlayer.hasAura(mAspectOfTheHawk)) {
       switchActionBar(2);
       mKeyboard.type('7');
       return false;
@@ -220,7 +234,7 @@ public class HunterSolver implements RotationSolver {
       mKeyboard.type('8');
       return false;
     }
-        
+
     switchActionBar(1);
     return true;
   }
@@ -275,8 +289,7 @@ public class HunterSolver implements RotationSolver {
       // Check for buffs
       if (!isFullBuffed()) {
         return;
-      }
-      else if(mPet != null && !mPet.isDead()){ // Only attack while walking if the pet is alive
+      } else if (mPet != null && !mPet.isDead()) { // Only attack while walking if the pet is alive
         // Hunter's Mark
         if (mPlayerLevel >= 6 && !u.hasAura(mHuntersMark) && u.getDistance() < 40) {
           mKeyboard.type('8');
