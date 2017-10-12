@@ -69,7 +69,7 @@ public class RogueSolver implements RotationSolver {
 
 		if (targetDistance <= 5) {
 			// Slice and Dice
-			if (energyValue >= 25 && !mPlayer.hasAura(mSliceAndDice) && comboPoints > 0) {
+			if (mPlayerLevel >= 10 && energyValue >= 25 && !mPlayer.hasAura(mSliceAndDice) && comboPoints > 0) {
 				mKeyboard.type('3');
 			}
 			// Eviscerate		
@@ -92,7 +92,7 @@ public class RogueSolver implements RotationSolver {
 	@Override
 	public void pull(Unit u) {
 
-		// Try to Backstap / Ambush
+		// Try to Backstap / Ambush / Garrote
 		mKeyboard.type("3");
 		combat(u);
 	}
