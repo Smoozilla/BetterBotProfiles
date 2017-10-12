@@ -1,8 +1,11 @@
 package rotations;
 
 import com.betterbot.api.pub.BetterBot;
+import com.betterbot.api.pub.Database.Vendor;
 import com.betterbot.api.pub.Keyboard;
 import com.betterbot.api.pub.Unit;
+import com.betterbot.api.pub.Vector3f;
+import javax.swing.JComponent;
 import com.betterbot.api.pub.RotationSolver;
 
 /**
@@ -15,7 +18,7 @@ public class DruidSolver implements RotationSolver {
 	BetterBot mBot;
 	Keyboard mKeyboard;
 	Unit mPlayer;
-	
+
 	float mDrinkPercent;
 	boolean mDrinking;
 	int mPlayerLevel;
@@ -54,27 +57,32 @@ public class DruidSolver implements RotationSolver {
 		if (mPlayer.getHealthFloat() > 0.60f) {
 
 			float manaValue = mPlayer.getManaFloat();
-			
 			float targetDistance = u.getDistance();
-			
+
+			// To make sure the bot is attacking on low level
+			if(mPlayerLevel < 10){
+				mKeyboard.type('7');
+			}
+
 			// Moonfire
-			if(mPlayerLevel >= 4 && targetDistance < 30 && u.getHealthFloat() > 0.2f && !u.hasAura(mMoonfire) && manaValue >= 0.3f) {
-				mKeyboard.type("2");
+			if (mPlayerLevel >= 4 && targetDistance < 30 && u.getHealthFloat() > 0.2f && !u.hasAura(mMoonfire)
+					&& manaValue >= 0.3f) {
+				mKeyboard.type('2');
 			}
 			// Wrath
-			else if(targetDistance < 30 && manaValue >= 0.2f){
-				mKeyboard.type("4");				
+			else if (targetDistance < 30 && manaValue >= 0.2f) {
+				mKeyboard.type('4');
 			}
 			// Melee Attack
 			else if (targetDistance <= 5) {
-				mKeyboard.type("7");
+				mKeyboard.type('7');
 			}
 		}
 		// Player below 60% Health
 		else {
 			// Healing Touch
 			if (mPlayer.getManaFloat() >= 0.2f) {
-				mKeyboard.type("3");
+				mKeyboard.type('3');
 			}
 		}
 	}
@@ -83,10 +91,10 @@ public class DruidSolver implements RotationSolver {
 	public void pull(Unit u) {
 		if (!isFullBuffed())
 			return;
-		
-		// Pull with wrath
-		mKeyboard.type("4");
-		
+
+		// Pull with Wrath
+		mKeyboard.type('4');
+
 		combat(u);
 	}
 
@@ -94,25 +102,22 @@ public class DruidSolver implements RotationSolver {
 	public boolean combatEnd(Unit u) {
 
 		drink();
-		if (mDrinking)
-			return true;
-
-		return false;
+		return mDrinking;
 	}
 
-	boolean isFullBuffed() {		
-		
+	boolean isFullBuffed() {
+
 		// Mark of the Wild
-		if(mPlayerLevel >= 2 && !mPlayer.hasAura(mMarkOfTheWild)) {
-			mKeyboard.type("-");
+		if (mPlayerLevel >= 2 && !mPlayer.hasAura(mMarkOfTheWild)) {
+			mKeyboard.type('-');
 			return false;
 		}
 		// Thorns
-		if(mPlayerLevel >= 6 && !mPlayer.hasAura(mThorns)) {
-			mKeyboard.type("9");
+		if (mPlayerLevel >= 6 && !mPlayer.hasAura(mThorns)) {
+			mKeyboard.type('9');
 			return false;
 		}
-		
+
 		return true;
 	}
 
@@ -125,10 +130,10 @@ public class DruidSolver implements RotationSolver {
 			mKeyboard.type('0'); // drink bind
 			mBot.sleep(1200, 1700); // prevent double drinking
 		}
-		
+
 		if (mDrinking && mPlayer.getManaFloat() > 0.9f) {
 			// over 90% mana, good enough
-			mKeyboard.type("w"); // force to be standing
+			mKeyboard.type('w'); // force to be standing
 			mDrinking = false;
 		}
 	}
@@ -138,7 +143,43 @@ public class DruidSolver implements RotationSolver {
 		return 30;
 	}
 
-  @Override
-  public void approaching(Unit u) {    
-  }
+	@Override
+	public void approaching(Unit u) {
+	}
+
+	@Override
+	public boolean afterResurrect() {
+
+		if(mPlayer.inCombat())
+			return false;
+
+		drink();
+
+		return mDrinking;
+	}
+
+	@Override
+	public boolean atVendor(Vendor arg0) {
+		return false;
+	}
+
+	@Override
+	public boolean beforeInteract() {
+		return false;
+	}
+
+	@Override
+	public JComponent getUI() {
+		return null;
+	}
+
+	@Override
+	public Vendor getVendor() {
+		return null;
+	}
+
+	@Override
+	public boolean prepareForTravel(Vector3f arg0) {
+		return false;
+	}
 }

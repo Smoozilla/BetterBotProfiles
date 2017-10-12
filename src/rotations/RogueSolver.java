@@ -1,9 +1,11 @@
 package rotations;
 
 import com.betterbot.api.pub.BetterBot;
+import com.betterbot.api.pub.Database.Vendor;
 import com.betterbot.api.pub.Keyboard;
-import com.betterbot.api.pub.Movement;
 import com.betterbot.api.pub.Unit;
+import com.betterbot.api.pub.Vector3f;
+import javax.swing.JComponent;
 import com.betterbot.api.pub.RotationSolver;
 
 /**
@@ -144,5 +146,35 @@ public class RogueSolver implements RotationSolver {
 				mKeyboard.type('1');
 			}
 		}
+	}
+
+	@Override
+	public boolean afterResurrect() {
+		return false;
+	}
+
+	@Override
+	public boolean atVendor(Vendor arg0) {
+		return false;
+	}
+
+	@Override
+	public boolean beforeInteract() {
+		return false;
+	}
+
+	@Override
+	public JComponent getUI() {
+		return null;
+	}
+
+	@Override
+	public Vendor getVendor() {
+		return null;
+	}
+
+	@Override
+	public boolean prepareForTravel(Vector3f arg0) {
+		return false;
 	}
 }
