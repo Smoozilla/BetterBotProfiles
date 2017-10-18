@@ -5,6 +5,7 @@ import com.betterbot.api.pub.Database.Vendor;
 import com.betterbot.api.pub.Keyboard;
 import com.betterbot.api.pub.Unit;
 import com.betterbot.api.pub.Vector3f;
+import java.awt.event.KeyEvent;
 import javax.swing.JComponent;
 import com.betterbot.api.pub.RotationSolver;
 
@@ -22,6 +23,7 @@ public class RogueSolver implements RotationSolver {
 	float mEatPercent;
 	boolean mEating;
 	int mPlayerLevel;
+	int mActionBar;
 
 	// Everything sorted by rank!
 	// Spells
@@ -35,11 +37,37 @@ public class RogueSolver implements RotationSolver {
 	// Drinking Buffs
 	int mEatingBuffs[] = { 433, 434, 1127, 1129, 1131, 25700, 25886, 28616, 29008, 29073 };
 
+	// Mounts
+	int mMounts[] = {
+			// Wolfs
+			1132, 6653, 6654, 23251, 23252, 23250,
+			// Raptors
+			10799, 10796, 8395, 23243, 23242, 23241,
+			// Kodos
+			18989, 18990, 23247, 23248, 23249,
+			// Undead Horses
+			17462, 17464, 17463, 17465, 23246,
+			// Horses
+			472, 6648, 458, 470, 23228, 23227, 23229,
+			// Saber
+			10789, 8394, 10793, 23221, 23219, 23338,
+			// Rams
+			6898, 6777, 6899, 23240, 23239, 23238,
+			// Mechanostrider
+			17454, 10873, 17453, 10969, 23222, 23223, 23225,
+			// PvP - Horde
+			22721, 22722, 22724, 22718, 23509,
+			// PvP - Alliance
+			22717, 22723, 22720, 22719, 23510,
+			// Special (mostly Dungeons)
+			24252, 17450, 24242, 16084, 18991, 18992, 17229 };
+
 	public RogueSolver(BetterBot bot) {
 		mBot = bot;
 		mPlayer = bot.getPlayer();
 		mKeyboard = bot.getKeyboard();
 		mPlayerLevel = mPlayer.getLevel();
+		mActionBar = 1;
 
 		System.out.println("TheCrux's Rogue script started");
 
@@ -47,8 +75,23 @@ public class RogueSolver implements RotationSolver {
 		mEating = false;
 	}
 
+	void switchActionBar(int bar) {
+		if (mActionBar != bar) {
+			mKeyboard.press(KeyEvent.VK_SHIFT);
+			mKeyboard.type("" + bar);
+			mKeyboard.release(KeyEvent.VK_SHIFT);
+			mActionBar = bar;
+		}
+	}
+
 	@Override
 	public void combat(Unit u) {
+
+		if (mPlayerLevel >= 40 && mPlayer.hasAura(mMounts)) {
+			switchActionBar(2);
+			mKeyboard.type('0');
+			switchActionBar(1);
+		}
 
 		int energyValue = mPlayer.getEnergy();
 		int comboPoints = mBot.getComboPoints();
@@ -57,7 +100,7 @@ public class RogueSolver implements RotationSolver {
 		float targetHealth = u.getHealthFloat();
 
 		// Kick
-		if (mPlayerLevel >= 12 && u.isCasting() && !mBot.anyOnCD(mKick)) {
+		if (mPlayerLevel >= 12 && u.isCasting() && u.getManaMax() > 0 && !mBot.anyOnCD(mKick)) {
 			mKeyboard.type('6');
 		}
 
@@ -135,6 +178,14 @@ public class RogueSolver implements RotationSolver {
 		long now = System.currentTimeMillis();
 		// Slow dooooown!
 		if (now - waitFlag > 500 && u.getDistance() < 25) {
+
+			if (mPlayerLevel >= 40 && !mPlayer.hasAura(mMounts)) {
+				switchActionBar(2);
+				mKeyboard.type('0');
+				switchActionBar(1);
+				return;
+			}
+
 			waitFlag = now;
 
 			// Stealth
@@ -160,6 +211,13 @@ public class RogueSolver implements RotationSolver {
 
 	@Override
 	public boolean beforeInteract() {
+		// Remove Mount
+		if (mPlayerLevel >= 40 && mPlayer.hasAura(mMounts)) {
+			switchActionBar(2);
+			mKeyboard.type('0');
+			switchActionBar(1);
+			return true;
+		}
 		return false;
 	}
 
@@ -175,6 +233,17 @@ public class RogueSolver implements RotationSolver {
 
 	@Override
 	public boolean prepareForTravel(Vector3f arg0) {
+		if (mPlayer.isCasting()) {
+			return true;
+		}
+
+		// Mount
+		if (mPlayerLevel >= 40 && !mPlayer.hasAura(mMounts)) {
+			switchActionBar(2);
+			mKeyboard.type('0');
+			switchActionBar(1);
+			return true;
+		}
 		return false;
 	}
 }

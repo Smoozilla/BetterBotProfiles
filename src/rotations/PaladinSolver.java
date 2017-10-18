@@ -5,6 +5,7 @@ import com.betterbot.api.pub.Database.Vendor;
 import com.betterbot.api.pub.Keyboard;
 import com.betterbot.api.pub.Unit;
 import com.betterbot.api.pub.Vector3f;
+import java.awt.event.KeyEvent;
 import javax.swing.JComponent;
 import com.betterbot.api.pub.RotationSolver;
 
@@ -22,6 +23,7 @@ public class PaladinSolver implements RotationSolver {
 	float mDrinkPercent;
 	boolean mDrinking;
 	int mPlayerLevel;
+	int mActionBar;
 
 	// Everything sorted by rank!
 	// Spells
@@ -41,11 +43,37 @@ public class PaladinSolver implements RotationSolver {
 	// Drinking Buffs
 	int mDrinkingBuffs[] = { 430, 431, 432, 1133, 1135, 1137, 10250, 22734, 24355, 29007 };
 
+	// Mounts
+	int mMounts[] = {
+			// Wolfs
+			1132, 6653, 6654, 23251, 23252, 23250,
+			// Raptors
+			10799, 10796, 8395, 23243, 23242, 23241,
+			// Kodos
+			18989, 18990, 23247, 23248, 23249,
+			// Undead Horses
+			17462, 17464, 17463, 17465, 23246,
+			// Horses
+			472, 6648, 458, 470, 23228, 23227, 23229,
+			// Saber
+			10789, 8394, 10793, 23221, 23219, 23338,
+			// Rams
+			6898, 6777, 6899, 23240, 23239, 23238,
+			// Mechanostrider
+			17454, 10873, 17453, 10969, 23222, 23223, 23225,
+			// PvP - Horde
+			22721, 22722, 22724, 22718, 23509,
+			// PvP - Alliance
+			22717, 22723, 22720, 22719, 23510,
+			// Special (mostly Dungeons)
+			24252, 17450, 24242, 16084, 18991, 18992, 17229 };
+
 	public PaladinSolver(BetterBot bot) {
 		this.mBot = bot;
 		mPlayer = bot.getPlayer();
 		mKeyboard = bot.getKeyboard();
 		mPlayerLevel = mPlayer.getLevel();
+		mActionBar = 1;
 
 		System.out.println("TheCrux's Paladin script started");
 
@@ -53,8 +81,25 @@ public class PaladinSolver implements RotationSolver {
 		mDrinking = false;
 	}
 
+	void switchActionBar(int bar) {
+		if (mActionBar != bar) {
+			mKeyboard.press(KeyEvent.VK_SHIFT);
+			mKeyboard.type("" + bar);
+			mBot.sleep(100, 300);
+			mKeyboard.release(KeyEvent.VK_SHIFT);
+			mActionBar = bar;
+		}
+	}
+
 	@Override
 	public void combat(Unit u) {
+		switchActionBar(1);
+
+		if (mPlayerLevel >= 40 && mPlayer.hasAura(mMounts)) {
+			switchActionBar(2);
+			mKeyboard.type('0');
+			switchActionBar(1);
+		}
 
 		if (mPlayer.isCasting()) {
 			return;
@@ -109,11 +154,11 @@ public class PaladinSolver implements RotationSolver {
 		else {
 			// Lay on Hands
 			if (mPlayerLevel >= 10 && mPlayer.getHealthFloat() <= 0.1f && !mBot.anyOnCD(mLayOnHands)) {
-				mKeyboard.type('8');
+				mKeyboard.type('9');
 			}
 			// Hammer of Justice
 			if (mPlayerLevel >= 8 && targetDistance <= 10 && !mBot.anyOnCD(mHammerOfJustice) && manaValue >= 0.2f) {
-				mKeyboard.type('9');
+				mKeyboard.type('8');
 			}
 			// Holy Light
 			if (manaValue >= 0.2f) {
@@ -128,41 +173,44 @@ public class PaladinSolver implements RotationSolver {
 		if (mPlayerLevel >= 4 && !mBot.anyOnCD(mJudgement))
 			mKeyboard.type('1');
 
-		combat(u);
+		if (isFullBuffed(u.getDistance()))
+			combat(u);
 	}
 
 	@Override
 	public boolean combatEnd(Unit u) {
 
 		drink();
-		if (mDrinking)
-			return true;
-
-		return false;
+		return mDrinking;
 	}
 
 	boolean isFullBuffed(float distance) {
 
 		// Blessing of Might
 		if (mPlayerLevel >= 4 && !mPlayer.hasAura(mBlessingOfMight)) {
-			mKeyboard.type('-');
+			switchActionBar(2);
+			mKeyboard.type('8');
 			return false;
 		}
 		// Devotion Aura
 		if (!mPlayer.hasAura(mDevotionAura)) {
-			mKeyboard.type('=');
+			switchActionBar(2);
+			mKeyboard.type('9');
 			return false;
 		}
 		// Seal of the Crusader
 		if (mPlayerLevel >= 6 && distance < 15 && !mPlayer.hasAura(mSealOfTheCrusader)) {
+			switchActionBar(1);
 			mKeyboard.type('5');
 			return false;
 		}
 		// Seal of Righteousness
-		if(mPlayerLevel < 6 && distance < 10 && !mPlayer.hasAura(mSealOfRighteousness)){
+		if (mPlayerLevel < 6 && distance < 10 && !mPlayer.hasAura(mSealOfRighteousness)) {
+			switchActionBar(1);
 			mKeyboard.type('2');
 		}
 
+		switchActionBar(1);
 		return true;
 	}
 
@@ -198,6 +246,13 @@ public class PaladinSolver implements RotationSolver {
 		long now = System.currentTimeMillis();
 		// Slow dooooown!
 		if (now - waitFlag > 500) {
+
+			// Remove Mount
+			if (mPlayerLevel >= 40 && mPlayer.hasAura(mMounts)) {
+				switchActionBar(2);
+				mKeyboard.type('0');
+				switchActionBar(1);
+			}
 			waitFlag = now;
 			isFullBuffed(u.getDistance());
 		}
@@ -215,6 +270,13 @@ public class PaladinSolver implements RotationSolver {
 
 	@Override
 	public boolean beforeInteract() {
+		// Remove Mount
+		if (mPlayerLevel >= 40 && mPlayer.hasAura(mMounts)) {
+			switchActionBar(2);
+			mKeyboard.type('0');
+			switchActionBar(1);
+			return true;
+		}
 		return false;
 	}
 
@@ -230,6 +292,17 @@ public class PaladinSolver implements RotationSolver {
 
 	@Override
 	public boolean prepareForTravel(Vector3f arg0) {
+		if (mPlayer.isCasting()) {
+			return true;
+		}
+
+		// Mount
+		if (mPlayerLevel >= 40 && !mPlayer.hasAura(mMounts)) {
+			switchActionBar(2);
+			mKeyboard.type('0');
+			switchActionBar(1);
+			return true;
+		}
 		return false;
 	}
 }

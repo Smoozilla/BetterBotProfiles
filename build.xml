@@ -36,11 +36,11 @@
 		<jar basedir="${build.dir}" destfile="${dist.dir}/HunterBeastSolver.jar" includes="rotations/HunterBeastSolver.class"/>
 	</target>	
 	
-	<target name="expMage">
+	<target name="expMageFrost">
 		<mkdir dir="${build.dir}"/>
-		<javac includeantruntime="false" srcdir="${src.dir}/rotations" includes="MageSolver.java" destdir="${build.dir}" classpath="lib/libBetterBot.jar"/>
+		<javac includeantruntime="false" srcdir="${src.dir}/rotations" includes="MageFrostSolver.java" destdir="${build.dir}" classpath="lib/libBetterBot.jar"/>
 		<mkdir dir="${dist.dir}"/>
-		<jar basedir="${build.dir}" destfile="${dist.dir}/MageSolver.jar" includes="rotations/MageSolver.class"/>
+		<jar basedir="${build.dir}" destfile="${dist.dir}/MageFrostSolver.jar" includes="rotations/MageFrostSolver.class"/>
 	</target>
 	
 	<target name="expPaladin">
@@ -85,6 +85,6 @@
 		<jar basedir="${build.dir}" destfile="${dist.dir}/WarriorSolver.jar" includes="rotations/WarriorSolver.class"/>
 	</target>
 	
-	<target name="createAll" depends="expRotation,expDruid,expHunter,expHunterBeast,expMage,expPaladin,expPriest,expRogue,expShamanEnh,expShamanEle,expWarrior"/>
+	<target name="createAll" depends="expRotation,expDruid,expHunter,expHunterBeast,expMageFrost,expPaladin,expPriest,expRogue,expShamanEnh,expShamanEle,expWarrior"/>
 	
 </project>

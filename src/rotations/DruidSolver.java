@@ -34,6 +34,31 @@ public class DruidSolver implements RotationSolver {
 	// Drinking Buffs
 	int mDrinkingBuffs[] = { 430, 431, 432, 1133, 1135, 1137, 10250, 22734, 24355, 29007 };
 
+	// Mounts
+	int mMounts[] = {
+			// Wolfs
+			1132, 6653, 6654, 23251, 23252, 23250,
+			// Raptors
+			10799, 10796, 8395, 23243, 23242, 23241,
+			// Kodos
+			18989, 18990, 23247, 23248, 23249,
+			// Undead Horses
+			17462, 17464, 17463, 17465, 23246,
+			// Horses
+			472, 6648, 458, 470, 23228, 23227, 23229,
+			// Saber
+			10789, 8394, 10793, 23221, 23219, 23338,
+			// Rams
+			6898, 6777, 6899, 23240, 23239, 23238,
+			// Mechanostrider
+			17454, 10873, 17453, 10969, 23222, 23223, 23225,
+			// PvP - Horde
+			22721, 22722, 22724, 22718, 23509,
+			// PvP - Alliance
+			22717, 22723, 22720, 22719, 23510,
+			// Special (mostly Dungeons)
+			24252, 17450, 24242, 16084, 18991, 18992, 17229 };
+
 	public DruidSolver(BetterBot bot) {
 		this.mBot = bot;
 		mPlayer = bot.getPlayer();
@@ -49,6 +74,11 @@ public class DruidSolver implements RotationSolver {
 	@Override
 	public void combat(Unit u) {
 
+		// Remove Mount
+		if (mPlayerLevel >= 40 && mPlayer.hasAura(mMounts)) {
+			mKeyboard.type('-');
+		}
+
 		if (mPlayer.isCasting()) {
 			return;
 		}
@@ -60,7 +90,7 @@ public class DruidSolver implements RotationSolver {
 			float targetDistance = u.getDistance();
 
 			// To make sure the bot is attacking on low level
-			if(mPlayerLevel < 10){
+			if (mPlayerLevel < 6) {
 				mKeyboard.type('7');
 			}
 
@@ -109,12 +139,12 @@ public class DruidSolver implements RotationSolver {
 
 		// Mark of the Wild
 		if (mPlayerLevel >= 2 && !mPlayer.hasAura(mMarkOfTheWild)) {
-			mKeyboard.type('-');
+			mKeyboard.type('9');
 			return false;
 		}
 		// Thorns
 		if (mPlayerLevel >= 6 && !mPlayer.hasAura(mThorns)) {
-			mKeyboard.type('9');
+			mKeyboard.type('8');
 			return false;
 		}
 
@@ -143,14 +173,28 @@ public class DruidSolver implements RotationSolver {
 		return 30;
 	}
 
+	long waitFlag = System.currentTimeMillis();
+
 	@Override
 	public void approaching(Unit u) {
+
+		long now = System.currentTimeMillis();
+		// Slow dooooown!
+		if (now - waitFlag > 500) {
+
+			// Remove Mount
+			if (mPlayerLevel >= 40 && mPlayer.hasAura(mMounts)) {
+				mKeyboard.type('-');
+			}
+			waitFlag = now;
+			isFullBuffed();
+		}
 	}
 
 	@Override
 	public boolean afterResurrect() {
 
-		if(mPlayer.inCombat())
+		if (mPlayer.inCombat())
 			return false;
 
 		drink();
@@ -165,6 +209,12 @@ public class DruidSolver implements RotationSolver {
 
 	@Override
 	public boolean beforeInteract() {
+
+		// Remove Mount
+		if (mPlayerLevel >= 40 && mPlayer.hasAura(mMounts)) {
+			mKeyboard.type('-');
+			return true;
+		}
 		return false;
 	}
 
@@ -180,6 +230,14 @@ public class DruidSolver implements RotationSolver {
 
 	@Override
 	public boolean prepareForTravel(Vector3f arg0) {
+		if (mPlayer.isCasting()) {
+			return true;
+		}
+
+		// Mount
+		if (mPlayerLevel >= 40 && !mPlayer.hasAura(mMounts)) {
+			mKeyboard.type('-');
+		}
 		return false;
 	}
 }
