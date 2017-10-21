@@ -2,9 +2,11 @@
 *.class
 
 # Project specific files
+/nbproject/
 .project
 .classpath
 
-# Build and Dist Folder
+# build, dist and test (cause it's empty) Folder
 /build/
 /dist/
+/test/

@@ -1,8 +1,8 @@
 <project name="BetterBotProfiles" basedir="." default="createAll">
 	
-    <property name="src.dir" value="src"/>
-		<property name="dist.dir" value="dist"/>
-    <property name="build.dir" value="build"/>
+  <property name="src.dir" value="src"/>
+	<property name="dist.dir" value="dist"/>
+  <property name="build.dir" value="build"/>
 
 	<target name="clean">
 		<delete dir="${build.dir}"/>
