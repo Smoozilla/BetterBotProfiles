@@ -47,7 +47,7 @@ public class MageFrostSolver implements RotationSolver {
   int mConjuredWater[] = { 5350, 2288, 2136, 3772, 8077, 8078, 8079 };
 
   // Eating Buffs
-  int mEatingBuffs[] = { 433, 434, 1127, 1129, 1131, 25700, 25886, 28616, 29008, 29073 };
+  int mEatingBuffs[] = { 433, 434, 435, 1127, 1129, 1131, 2639, 6410, 7737, 24005, 25700, 25886, 28616, 29008, 29073 };
   int mConjuredFood[] = { 5349, 1113, 1114, 1487, 8075, 8076, 22895 };
 
   int mManaGems[] = { 5514, 5513, 8007, 8008 };

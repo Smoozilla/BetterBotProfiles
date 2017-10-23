@@ -40,7 +40,7 @@ public class WarriorSolver implements RotationSolver {
 	int mRetaliation = 20230;
 
 	// Eating Buffs
-	int mEatingBuffs[] = { 433, 434, 1127, 1129, 1131, 25700, 25886, 28616, 29008, 29073 };
+	int mEatingBuffs[] = { 433, 434, 435, 1127, 1129, 1131, 2639, 6410, 7737, 24005, 25700, 25886, 28616, 29008, 29073 };
 
 	// Mounts
 	int mMounts[] = {
