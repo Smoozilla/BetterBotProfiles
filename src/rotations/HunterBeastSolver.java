@@ -409,7 +409,7 @@ public class HunterBeastSolver implements RotationSolver {
   @Override
   public boolean atVendor(Vendor vend) {
     int stackAmount = 5;
-
+    
     if (mPlayerLevel >= 40) {
       stackAmount = 13;
       // Jagged Arrow or Accurate Slugs
@@ -502,7 +502,7 @@ public class HunterBeastSolver implements RotationSolver {
   @Override
   public boolean prepareForTravel(Vector3f travelTarget) {
     // Aspect of the Cheetah / Mount
-    if (mPlayerLevel >= 20 && mPlayer.hasAura(mAspectOfTheCheetah) && mPlayer.hasAura(mMounts)) {
+    if (mPlayerLevel >= 20 && !mPlayer.hasAura(mAspectOfTheCheetah) && !mPlayer.hasAura(mMounts)) {
       switchActionBar(2);
       mKeyboard.type('0');
       switchActionBar(1);
