@@ -105,9 +105,10 @@ public class MageFrostSolver implements RotationSolver {
   public void combat(Unit u) {
     switchActionBar(1);
 
+    // Remove Mount
     if (mPlayerLevel >= 40 && mPlayer.hasAura(mMounts)) {
       switchActionBar(2);
-      mKeyboard.type('0');
+      mKeyboard.type('-');
       switchActionBar(1);
     }
 
@@ -293,7 +294,7 @@ public class MageFrostSolver implements RotationSolver {
       // Remove Mount
       if (mPlayerLevel >= 40 && mPlayer.hasAura(mMounts)) {
         switchActionBar(2);
-        mKeyboard.type('0');
+        mKeyboard.type('-');
         switchActionBar(1);
       }
       waitFlag = now;
@@ -317,9 +318,10 @@ public class MageFrostSolver implements RotationSolver {
 
   @Override
   public boolean beforeInteract() {
+    // Remove Mount
     if (mPlayerLevel >= 40 && mPlayer.hasAura(mMounts)) {
       switchActionBar(2);
-      mKeyboard.type('0');
+      mKeyboard.type('-');
       switchActionBar(1);
       return true;
     }
@@ -345,7 +347,7 @@ public class MageFrostSolver implements RotationSolver {
     // Mount
     if (mPlayerLevel >= 40 && !mPlayer.hasAura(mMounts)) {
       switchActionBar(2);
-      mKeyboard.type('0');
+      mKeyboard.type('-');
       switchActionBar(1);
       return true;
     }
