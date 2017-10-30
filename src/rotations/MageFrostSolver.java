@@ -153,7 +153,7 @@ public class MageFrostSolver implements RotationSolver {
     else if (manaValue >= 0.1f) {
       mKeyboard.type('4');
     }
-    // Wand
+    // Wand OR Melee Attack
     else {
       mKeyboard.type('7');
     }
@@ -186,7 +186,7 @@ public class MageFrostSolver implements RotationSolver {
     }
 
     // Arcane Intellect
-    if (!mPlayer.hasAura(mArcaneIntellect)) {
+    if (mPlayerLevel >= 2 && !mPlayer.hasAura(mArcaneIntellect)) {
       switchActionBar(2);
       mKeyboard.type('2');
       return false;
@@ -226,21 +226,21 @@ public class MageFrostSolver implements RotationSolver {
       mEating = true;
 
     // Conjure some water
-    if (mPlayerLevel >= 4 && !mDrinking && !mEating && mInventory.getItemCount(mConjuredWater) <= 1) {
+    if (mPlayerLevel >= 4 && mInventory.getItemCount(mConjuredWater) <= 1) {
       switchActionBar(2);
       mKeyboard.type('8');
       return;
     }
 
     // Conjure some food
-    if (mPlayerLevel >= 6 && !mDrinking && !mEating && mInventory.getItemCount(mConjuredFood) <= 1) {
+    if (mPlayerLevel >= 6 && mInventory.getItemCount(mConjuredFood) <= 1) {
       switchActionBar(2);
       mKeyboard.type('7');
       return;
     }
 
     // Conjure a mana gem
-    if (mPlayerLevel >= 28 && !mDrinking && !mEating && mInventory.getItemCount(mManaGems) == 0) {
+    if (mPlayerLevel >= 28 && mInventory.getItemCount(mManaGems) == 0) {
       switchActionBar(2);
       mKeyboard.type('6');
       return;

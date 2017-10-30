@@ -193,7 +193,7 @@ public class PaladinSolver implements RotationSolver {
 			return false;
 		}
 		// Devotion Aura
-		if (!mPlayer.hasAura(mDevotionAura)) {
+		if (mPlayerLevel >= 2 && !mPlayer.hasAura(mDevotionAura)) {
 			switchActionBar(2);
 			mKeyboard.type('9');
 			return false;

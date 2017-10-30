@@ -40,7 +40,8 @@ public class WarriorSolver implements RotationSolver {
 	int mRetaliation = 20230;
 
 	// Eating Buffs
-	int mEatingBuffs[] = { 433, 434, 435, 1127, 1129, 1131, 2639, 6410, 7737, 24005, 25700, 25886, 28616, 29008, 29073 };
+	int mEatingBuffs[] = { 433, 434, 435, 1127, 1129, 1131, 2639, 6410, 7737, 24005, 25700, 25886, 28616, 29008,
+			29073 };
 
 	// Mounts
 	int mMounts[] = {
@@ -139,7 +140,8 @@ public class WarriorSolver implements RotationSolver {
 			mKeyboard.type('6');
 		}
 		// Bloodthirst OR Mortal Strike
-		else if (mPlayerLevel >= 40 && (!mBot.anyOnCD(mBloodthirst) || !mBot.anyOnCD(mMortalStrike)) && rageValue >= 30) {
+		else if (mPlayerLevel >= 40 && (!mBot.anyOnCD(mBloodthirst) || !mBot.anyOnCD(mMortalStrike))
+				&& rageValue >= 30) {
 			mKeyboard.type('4');
 		}
 		// Execute

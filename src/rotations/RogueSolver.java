@@ -27,16 +27,15 @@ public class RogueSolver implements RotationSolver {
   // Everything sorted by rank!
   // Spells
   int mKick[] = { 1766, 1767, 1768, 1769 };
-  int mSliceAndDice[] = { 5171, 6774 };
 
   // Buffs
   int mStealth[] = { 1784, 1785, 1786, 1787 };
   int mEvasion = 5277;
+  int mSliceAndDice[] = { 5171, 6774 };
 
   // Eating Buffs
   int mEatingBuffs[] = { 433, 434, 435, 1127, 1129, 1131, 2639, 6410, 7737, 24005, 25700, 25886, 28616, 29008, 29073 };
-
-  int mEatBufffood[] = { 5004, 5005, 5006, 5007, 10256, 10257, 18229, 18230, 18231, 24800, 24869, 25660 };
+  int mBuffFood[] = { 5004, 5005, 5006, 5007, 10256, 10257, 18229, 18230, 18231, 24800, 24869, 25660 };
 
   // Mounts
   int mMounts[] = {
@@ -87,6 +86,7 @@ public class RogueSolver implements RotationSolver {
 
   @Override
   public void combat(Unit u) {
+    // Remove Mount
     if (mPlayerLevel >= 40 && mPlayer.hasAura(mMounts)) {
       switchActionBar(2);
       mKeyboard.type('0');
@@ -105,7 +105,7 @@ public class RogueSolver implements RotationSolver {
     }
 
     // Evasion
-    if (mPlayerLevel >= 8 && mPlayer.getHealthFloat() <= 0.5f && !mPlayer.hasAura(mEvasion)
+    if (mPlayerLevel >= 8 && (mPlayer.getHealthFloat() <= 0.5f || mBot.getAttackers().length() > 1) && !mPlayer.hasAura(mEvasion)
         && !mBot.anyOnCD(mEvasion)) {
       mKeyboard.type('8');
     }
@@ -145,21 +145,33 @@ public class RogueSolver implements RotationSolver {
     return mEating;
   }
 
+  long mFoodTimer;
+
   void eat() {
 
     if (mPlayer.getHealthFloat() < mEatPercent) {
+      if (!mEating) {
+        mFoodTimer = 0;
+      }
       mEating = true;
     }
 
-    if (mEating && !mPlayer.hasAura(mEatingBuffs) && mPlayer.getHealthFloat() < mEatPercent + 0.05f) {
+    if (mEating && !mPlayer.hasAura(mEatingBuffs) && !mPlayer.hasAura(mBuffFood)
+        && mPlayer.getHealthFloat() < mEatPercent + 0.05f) {
       mKeyboard.type('0'); // eat bind
+      if (mFoodTimer == 0) {
+        mFoodTimer = System.currentTimeMillis();
+      }
       mBot.sleep(1200, 1700); // prevent double eating
     }
 
+    // over 90% health, good enough
     if (mEating && mPlayer.getHealthFloat() > 0.9f) {
-      // over 90% health, good enough
-      mKeyboard.type('w'); // force to be standing
-      mEating = false;
+      // But only if we didn't ate bufffood or ate for 10.5 sec.
+      if (!mPlayer.hasAura(mBuffFood) || ((System.currentTimeMillis() - mFoodTimer) > 10500)) {
+        mKeyboard.type('w'); // force to be standing
+        mEating = false;
+      }
     }
   }
 
@@ -168,14 +180,14 @@ public class RogueSolver implements RotationSolver {
     return 5;
   }
 
-  long waitFlag = System.currentTimeMillis();
+  long mWaitFlag = System.currentTimeMillis();
 
   @Override
   public void approaching(Unit u) {
     long now = System.currentTimeMillis();
     // Slow dooooown!
-    if (now - waitFlag > 500 && u.getDistance() < 25) {
-      waitFlag = now;
+    if (now - mWaitFlag > 500 && u.getDistance() < 25) {
+      mWaitFlag = now;
 
       // Remove Mount
       if (mPlayerLevel >= 40 && mPlayer.hasAura(mMounts)) {
@@ -198,7 +210,8 @@ public class RogueSolver implements RotationSolver {
 
   @Override
   public boolean afterResurrect() {
-    return false;
+    eat();
+    return mEating;
   }
 
   @Override
@@ -220,7 +233,6 @@ public class RogueSolver implements RotationSolver {
 
   @Override
   public JComponent getUI() {
-
     return null;
   }
 
