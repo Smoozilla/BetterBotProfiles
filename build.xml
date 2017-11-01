@@ -9,9 +9,9 @@
 <!-- in the project's Project Properties dialog box.-->
 <project name="Profiles" default="createAll" basedir=".">
     <description>Builds, tests, and runs the project Profiles.</description>
-    <import file="nbproject/build-impl.xml"/>
-    
-  <property name="src.dir" value="src"/>
+    <!--<import file="nbproject/build-impl.xml"/>-->
+
+    <property name="src.dir" value="src"/>
 	<property name="dist.dir" value="dist"/>
   <property name="build.dir" value="build"/>
 
@@ -21,140 +21,94 @@
 	
 	<target name="expRotation">
             <mkdir dir="${build.dir}"/>
-            <javac includeantruntime="false" srcdir="${src.dir}" destdir="${build.dir}" classpath="${dist.dir}/lib/libBetterBot.jar"/>
+            <javac includeantruntime="false" srcdir="${src.dir}" destdir="${build.dir}" classpath="lib/libBetterBot.jar"/>
             <mkdir dir="${dist.dir}"/>
             <jar basedir="${build.dir}" destfile="${dist.dir}/Rotations.jar"/>
 	</target>
 		
 	<target name="expDruid">
 		<mkdir dir="${build.dir}"/>
-		<javac includeantruntime="false" srcdir="${src.dir}" includes="rotations/DruidSolver.java" destdir="${build.dir}" classpath="${dist.dir}/lib/libBetterBot.jar"/>
+		<javac includeantruntime="false" srcdir="${src.dir}" includes="rotations/DruidSolver.java" destdir="${build.dir}" classpath="lib/libBetterBot.jar"/>
 		<mkdir dir="${dist.dir}"/>
 		<jar basedir="${build.dir}" destfile="${dist.dir}/DruidSolver.jar" includes="rotations/DruidSolver.class"/>
 	</target>	
 	
+	<target name="expDruidBalance">
+		<mkdir dir="${build.dir}"/>
+		<javac includeantruntime="false" srcdir="${src.dir}" includes="rotations/DruidBalanceSolver.java,ui/RotationUI.java" destdir="${build.dir}" classpath="lib/libBetterBot.jar"/>
+		<mkdir dir="${dist.dir}"/>
+		<jar basedir="${build.dir}" destfile="${dist.dir}/DruidBalanceSolver.jar" includes="rotations/DruidBalanceSolver.class,ui/RotationUI.class"/>
+	</target>
+
+	<target name="expDruidFeral" depends="clean">
+		<mkdir dir="${build.dir}"/>
+		<javac includeantruntime="false" srcdir="${src.dir}" includes="rotations/DruidFeralSolver.java,ui/RotationUI.java" destdir="${build.dir}" classpath="lib/libBetterBot.jar"/>
+		<mkdir dir="${dist.dir}"/>
+		<jar basedir="${build.dir}" destfile="${dist.dir}/DruidFeralSolver.jar" includes="rotations/**/*.class,ui/**/*.class"/>
+	</target>
+
 	<target name="expHunter" depends="clean">
 		<mkdir dir="${build.dir}"/>
-		<javac includeantruntime="false" srcdir="${src.dir}" includes="rotations/HunterSolver.java" destdir="${build.dir}" classpath="${dist.dir}/lib/libBetterBot.jar"/>
+		<javac includeantruntime="false" srcdir="${src.dir}" includes="rotations/HunterSolver.java" destdir="${build.dir}" classpath="lib/libBetterBot.jar"/>
 		<mkdir dir="${dist.dir}"/>
 		<jar basedir="${build.dir}" destfile="${dist.dir}/HunterSolver.jar" includes="rotations/HunterSolver.class"/>
-	</target>	
+	</target>
 	
 	<target name="expHunterBeast" depends="clean">
 		<mkdir dir="${build.dir}"/>
-		<javac includeantruntime="false" srcdir="${src.dir}" includes="rotations/HunterBeastSolver.java" destdir="${build.dir}" classpath="${dist.dir}/lib/libBetterBot.jar"/>
+		<javac includeantruntime="false" srcdir="${src.dir}" includes="rotations/HunterBeastSolver.java" destdir="${build.dir}" classpath="lib/libBetterBot.jar"/>
 		<mkdir dir="${dist.dir}"/>
 		<jar basedir="${build.dir}" destfile="${dist.dir}/HunterBeastSolver.jar" includes="rotations/HunterBeastSolver.class"/>
 	</target>	
 	
 	<target name="expMageFrost">
 		<mkdir dir="${build.dir}"/>
-		<javac includeantruntime="false" srcdir="${src.dir}" includes="rotations/MageFrostSolver.java" destdir="${build.dir}" classpath="${dist.dir}/lib/libBetterBot.jar"/>
+		<javac includeantruntime="false" srcdir="${src.dir}" includes="rotations/MageFrostSolver.java" destdir="${build.dir}" classpath="lib/libBetterBot.jar"/>
 		<mkdir dir="${dist.dir}"/>
 		<jar basedir="${build.dir}" destfile="${dist.dir}/MageFrostSolver.jar" includes="rotations/MageFrostSolver.class"/>
 	</target>
 	
 	<target name="expPaladin">
 		<mkdir dir="${build.dir}"/>
-		<javac includeantruntime="false" srcdir="${src.dir}" includes="rotations/PaladinSolver.java" destdir="${build.dir}" classpath="${dist.dir}/lib/libBetterBot.jar"/>
+		<javac includeantruntime="false" srcdir="${src.dir}" includes="rotations/PaladinSolver.java" destdir="${build.dir}" classpath="lib/libBetterBot.jar"/>
 		<mkdir dir="${dist.dir}"/>
 		<jar basedir="${build.dir}" destfile="${dist.dir}/PaladinSolver.jar" includes="rotations/PaladinSolver.class"/>
 	</target>
 	
 	<target name="expPriest">
 		<mkdir dir="${build.dir}"/>
-		<javac includeantruntime="false" srcdir="${src.dir}" includes="rotations/PriestSolver.java" destdir="${build.dir}" classpath="${dist.dir}/lib/libBetterBot.jar"/>
+		<javac includeantruntime="false" srcdir="${src.dir}" includes="rotations/PriestSolver.java" destdir="${build.dir}" classpath="lib/libBetterBot.jar"/>
 		<mkdir dir="${dist.dir}"/>
 		<jar basedir="${build.dir}" destfile="${dist.dir}/PriestSolver.jar" includes="rotations/PriestSolver.class"/>
 	</target>
 	
 	<target name="expRogue">
 		<mkdir dir="${build.dir}"/>
-		<javac includeantruntime="false" srcdir="${src.dir}" includes="rotations/RogueSolver.java" destdir="${build.dir}" classpath="${dist.dir}/lib/libBetterBot.jar"/>
+		<javac includeantruntime="false" srcdir="${src.dir}" includes="rotations/RogueSolver.java" destdir="${build.dir}" classpath="lib/libBetterBot.jar"/>
 		<mkdir dir="${dist.dir}"/>
 		<jar basedir="${build.dir}" destfile="${dist.dir}/RogueSolver.jar" includes="rotations/RogueSolver.class"/>
 	</target>
 	
 	<target name="expShamanEnh">
 		<mkdir dir="${build.dir}"/>
-		<javac includeantruntime="false" srcdir="${src.dir}" includes="rotations/ShamanEnhancementSolver.java,ui/RotationUI.java" destdir="${build.dir}" classpath="${dist.dir}/lib/libBetterBot.jar"/>
+		<javac includeantruntime="false" srcdir="${src.dir}" includes="rotations/ShamanEnhancementSolver.java,ui/RotationUI.java" destdir="${build.dir}" classpath="lib/libBetterBot.jar"/>
 		<mkdir dir="${dist.dir}"/>
 		<jar basedir="${build.dir}" destfile="${dist.dir}/ShamanEnhancementSolver.jar" includes="rotations/ShamanEnhancementSolver.class,ui/RotationUI.class"/>
 	</target>
 
 	<target name="expShamanEle">
 		<mkdir dir="${build.dir}"/>
-		<javac includeantruntime="false" srcdir="${src.dir}" includes="rotations/ShamanElementalSolver.java" destdir="${build.dir}" classpath="${dist.dir}/lib/libBetterBot.jar"/>
+		<javac includeantruntime="false" srcdir="${src.dir}" includes="rotations/ShamanElementalSolver.java" destdir="${build.dir}" classpath="lib/libBetterBot.jar"/>
 		<mkdir dir="${dist.dir}"/>
 		<jar basedir="${build.dir}" destfile="${dist.dir}/ShamanElementalSolver.jar" includes="rotations/ShamanElementalSolver.class"/>
 	</target>
 	
 	<target name="expWarrior">
 		<mkdir dir="${build.dir}"/>
-		<javac includeantruntime="false" srcdir="${src.dir}" includes="rotations/WarriorSolver.java" destdir="${build.dir}" classpath="${dist.dir}/lib/libBetterBot.jar"/>
+		<javac includeantruntime="false" srcdir="${src.dir}" includes="rotations/WarriorSolver.java" destdir="${build.dir}" classpath="lib/libBetterBot.jar"/>
 		<mkdir dir="${dist.dir}"/>
 		<jar basedir="${build.dir}" destfile="${dist.dir}/WarriorSolver.jar" includes="rotations/WarriorSolver.class"/>
 	</target>
 	
-	<target name="createAll" depends="expRotation,expDruid,expHunter,expHunterBeast,expMageFrost,expPaladin,expPriest,expRogue,expShamanEnh,expShamanEle,expWarrior"/>
-    <!--
-
-    There exist several targets which are by default empty and which can be 
-    used for execution of your tasks. These targets are usually executed 
-    before and after some main targets. They are: 
-
-      -pre-init:                 called before initialization of project properties
-      -post-init:                called after initialization of project properties
-      -pre-compile:              called before javac compilation
-      -post-compile:             called after javac compilation
-      -pre-compile-single:       called before javac compilation of single file
-      -post-compile-single:      called after javac compilation of single file
-      -pre-compile-test:         called before javac compilation of JUnit tests
-      -post-compile-test:        called after javac compilation of JUnit tests
-      -pre-compile-test-single:  called before javac compilation of single JUnit test
-      -post-compile-test-single: called after javac compilation of single JUunit test
-      -pre-jar:                  called before JAR building
-      -post-jar:                 called after JAR building
-      -post-clean:               called after cleaning build products
-
-    (Targets beginning with '-' are not intended to be called on their own.)
-
-    Example of inserting an obfuscator after compilation could look like this:
-
-        <target name="-post-compile">
-            <obfuscate>
-                <fileset dir="${build.classes.dir}"/>
-            </obfuscate>
-        </target>
-
-    For list of available properties check the imported 
-    nbproject/build-impl.xml file. 
-
-
-    Another way to customize the build is by overriding existing main targets.
-    The targets of interest are: 
-
-      -init-macrodef-javac:     defines macro for javac compilation
-      -init-macrodef-junit:     defines macro for junit execution
-      -init-macrodef-debug:     defines macro for class debugging
-      -init-macrodef-java:      defines macro for class execution
-      -do-jar:                  JAR building
-      run:                      execution of project 
-      -javadoc-build:           Javadoc generation
-      test-report:              JUnit report generation
-
-    An example of overriding the target for project execution could look like this:
-
-        <target name="run" depends="Profiles-impl.jar">
-            <exec dir="bin" executable="launcher.exe">
-                <arg file="${dist.jar}"/>
-            </exec>
-        </target>
-
-    Notice that the overridden target depends on the jar target and not only on 
-    the compile target as the regular run target does. Again, for a list of available 
-    properties which you can use, check the target you are overriding in the
-    nbproject/build-impl.xml file. 
-
-    -->
+	<target name="createAll" depends="expRotation,expDruid,expDruidFeral,expHunter,expHunterBeast,expMageFrost,expPaladin,expPriest,expRogue,expShamanEnh,expShamanEle,expWarrior"/>
 </project>

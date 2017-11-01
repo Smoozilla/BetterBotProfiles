@@ -1,5 +1,11 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package ui;
 
+import com.betterbot.api.pub.RotationSolver;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.FileInputStream;
@@ -8,6 +14,12 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JCheckBox;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import rotations.ICommonSettingFunctions;
 
 /**
  *
@@ -15,10 +27,82 @@ import java.util.logging.Logger;
  */
 public class RotationUI extends javax.swing.JPanel {
 
-  public RotationUI() {
-    initComponents();
+  RotationSolver mSolver;
+  ICommonSettingFunctions mSolverSettingsInterface; // probably pick better names for these lol 
 
+  /**
+   * Creates new form RotationUI
+   *
+   * @param solver The combat solver of a class
+   */
+  public RotationUI(RotationSolver solver) {
+    initComponents();
+    
+    mSolver = solver;
+    if (mSolver instanceof ICommonSettingFunctions) {
+      mSolverSettingsInterface = (ICommonSettingFunctions) mSolver;
+    }
+    
     loadSettings();
+
+    DocumentListener drinkListener = new DocumentListener() {
+      @Override
+      public void insertUpdate(DocumentEvent e) {
+        if (mSolverSettingsInterface != null) {
+          mSolverSettingsInterface.setDrinkPercentage(getDrinkPercentage());
+        }
+        saveSettings();
+      }
+
+      @Override
+      public void removeUpdate(DocumentEvent e) {
+        if (mSolverSettingsInterface != null) {
+          mSolverSettingsInterface.setDrinkPercentage(getDrinkPercentage());
+        }
+        saveSettings();
+      }
+
+      @Override
+      public void changedUpdate(DocumentEvent e) {
+        if (mSolverSettingsInterface != null) {
+          mSolverSettingsInterface.setDrinkPercentage(getDrinkPercentage());
+        }
+        saveSettings();
+      }
+    };
+    jDrinkPercentage.getDocument().addDocumentListener(drinkListener);
+    
+    DocumentListener eatListener = new DocumentListener() {
+      @Override
+      public void insertUpdate(DocumentEvent e) {
+        if (mSolverSettingsInterface != null) {
+          mSolverSettingsInterface.setEatPercentage(getEatPercentage());
+        }
+        saveSettings();
+      }
+
+      @Override
+      public void removeUpdate(DocumentEvent e) {
+        if (mSolverSettingsInterface != null) {
+          mSolverSettingsInterface.setEatPercentage(getEatPercentage());
+        }
+        saveSettings();
+      }
+
+      @Override
+      public void changedUpdate(DocumentEvent e) {
+        if (mSolverSettingsInterface != null) {
+          mSolverSettingsInterface.setEatPercentage(getEatPercentage());
+        }
+        saveSettings();
+      }
+    };
+    jEatPercentage.getDocument().addDocumentListener(eatListener);
+
+    ChangeListener checkListener = (ChangeEvent e) -> {
+      saveSettings();
+    };
+    jUseMount.addChangeListener(checkListener);
   }
 
   public boolean useMount() {
@@ -26,26 +110,43 @@ public class RotationUI extends javax.swing.JPanel {
   }
 
   public float getEatPercentage() {
-
     String text = jEatPercentage.getText();
+    float value;
     try {
-      return 100 / Float.parseFloat(text);
+      value = Float.parseFloat(text) / 100;
+      if (value > 0 && value < 1) {
+        System.out.println("Eat Percentage OK");
+        jEatOkay.setText("% - Value OK");
+        return value;
+      }
     }
     catch (NumberFormatException e) {
-      System.out.println("Invalid Eat Percentage: \"" + text + "\" -> " + e.getMessage());
-      return 0;
+      System.out.println("Invalid Eat Percentage: \"" + text + "%\" -> " + e.getMessage());
     }
+
+    System.out.println("Eat Percentage NOT OK");
+    jEatOkay.setText("% - Value NOT OK");
+    return 0;
   }
 
   public float getDrinkPercentage() {
     String text = jDrinkPercentage.getText();
+    float value;
     try {
-      return 100 / Float.parseFloat(text);
+      value = Float.parseFloat(text) / 100;
+      if (value > 0 && value < 1) {
+        System.out.println("Drink Percentage OK");
+        jDrinkOkay.setText("% - Value OK");
+        return value;
+      }
     }
     catch (NumberFormatException e) {
-      System.out.println("Invalid Drink Percentage: \"" + text + "\" -> " + e.getMessage());
-      return 0;
+      System.out.println("Invalid Drink Percentage: \"" + text + "%\" -> " + e.getMessage());
     }
+
+    System.out.println("Drink Percentage NOT OK");
+    jDrinkOkay.setText("% - Value NOT OK");
+    return 0;
   }
 
   private void loadSettings() {
@@ -118,41 +219,33 @@ public class RotationUI extends javax.swing.JPanel {
   // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
   private void initComponents() {
 
-    jLabel1 = new javax.swing.JLabel();
-    jUseMount = new javax.swing.JCheckBox();
+    jEatPercentage = new javax.swing.JTextField();
     jLabel2 = new javax.swing.JLabel();
-    jEatPercentage = new javax.swing.JFormattedTextField();
+    jDrinkPercentage = new javax.swing.JTextField();
     jLabel3 = new javax.swing.JLabel();
-    jDrinkPercentage = new javax.swing.JFormattedTextField();
+    jUseMount = new javax.swing.JCheckBox();
+    jEatOkay = new javax.swing.JLabel();
+    jDrinkOkay = new javax.swing.JLabel();
+    jLabel4 = new javax.swing.JLabel();
 
-    jLabel1.setText("Rotation Settings");
+    jEatPercentage.setText("40");
 
-    jUseMount.setText("Use Mount");
-    jUseMount.addActionListener(new java.awt.event.ActionListener() {
-      public void actionPerformed(java.awt.event.ActionEvent evt) {
-        jUseMountActionPerformed(evt);
-      }
-    });
-
+    jLabel2.setLabelFor(jEatPercentage);
     jLabel2.setText("Eat Percentage");
 
-    jEatPercentage.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#0.00%"))));
-    jEatPercentage.setText("40");
-    jEatPercentage.addActionListener(new java.awt.event.ActionListener() {
-      public void actionPerformed(java.awt.event.ActionEvent evt) {
-        jEatPercentageActionPerformed(evt);
-      }
-    });
+    jDrinkPercentage.setText("40");
 
+    jLabel3.setLabelFor(jDrinkPercentage);
     jLabel3.setText("Drink Percentage");
 
-    jDrinkPercentage.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#0.00%"))));
-    jDrinkPercentage.setText("40");
-    jDrinkPercentage.addActionListener(new java.awt.event.ActionListener() {
-      public void actionPerformed(java.awt.event.ActionEvent evt) {
-        jDrinkPercentageActionPerformed(evt);
-      }
-    });
+    jUseMount.setText("Use Mount");
+
+    jEatOkay.setText("%");
+
+    jDrinkOkay.setText("%");
+
+    jLabel4.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+    jLabel4.setText("Rotation Settings");
 
     javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
     this.setLayout(layout);
@@ -162,56 +255,56 @@ public class RotationUI extends javax.swing.JPanel {
         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
           .addGroup(layout.createSequentialGroup()
             .addContainerGap()
-            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-              .addComponent(jUseMount)
+            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
               .addComponent(jLabel2)
-              .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                .addComponent(jEatPercentage, javax.swing.GroupLayout.Alignment.LEADING)
-                .addComponent(jDrinkPercentage, javax.swing.GroupLayout.Alignment.LEADING)
-                .addComponent(jLabel3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+              .addComponent(jDrinkPercentage)
+              .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+              .addComponent(jUseMount)
+              .addComponent(jEatPercentage))
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+              .addComponent(jEatOkay)
+              .addComponent(jDrinkOkay)))
           .addGroup(layout.createSequentialGroup()
-            .addGap(148, 148, 148)
-            .addComponent(jLabel1)))
-        .addContainerGap(155, Short.MAX_VALUE))
+            .addContainerGap(137, Short.MAX_VALUE)
+            .addComponent(jLabel4)))
+        .addContainerGap(140, Short.MAX_VALUE))
     );
     layout.setVerticalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
       .addGroup(layout.createSequentialGroup()
-        .addGap(20, 20, 20)
-        .addComponent(jLabel1)
-        .addGap(8, 8, 8)
-        .addComponent(jUseMount)
+        .addContainerGap()
+        .addComponent(jLabel4)
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
         .addComponent(jLabel2)
+        .addGap(2, 2, 2)
+        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+          .addComponent(jEatPercentage, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+          .addComponent(jEatOkay))
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-        .addComponent(jEatPercentage, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
         .addComponent(jLabel3)
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-        .addComponent(jDrinkPercentage, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-        .addContainerGap(130, Short.MAX_VALUE))
+        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+          .addComponent(jDrinkPercentage, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+          .addComponent(jDrinkOkay))
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+        .addComponent(jUseMount)
+        .addContainerGap(138, Short.MAX_VALUE))
     );
   }// </editor-fold>//GEN-END:initComponents
 
-  private void jUseMountActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jUseMountActionPerformed
-    saveSettings();
-  }//GEN-LAST:event_jUseMountActionPerformed
-
-  private void jEatPercentageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jEatPercentageActionPerformed
-    saveSettings();
-  }//GEN-LAST:event_jEatPercentageActionPerformed
-
-  private void jDrinkPercentageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jDrinkPercentageActionPerformed
-    saveSettings();
-  }//GEN-LAST:event_jDrinkPercentageActionPerformed
-
+  public JCheckBox getUseMountComp() {
+    return jUseMount;
+  }
 
   // Variables declaration - do not modify//GEN-BEGIN:variables
-  private javax.swing.JFormattedTextField jDrinkPercentage;
-  private javax.swing.JFormattedTextField jEatPercentage;
-  private javax.swing.JLabel jLabel1;
+  private javax.swing.JLabel jDrinkOkay;
+  private javax.swing.JTextField jDrinkPercentage;
+  private javax.swing.JLabel jEatOkay;
+  private javax.swing.JTextField jEatPercentage;
   private javax.swing.JLabel jLabel2;
   private javax.swing.JLabel jLabel3;
+  private javax.swing.JLabel jLabel4;
   private javax.swing.JCheckBox jUseMount;
   // End of variables declaration//GEN-END:variables
 }
