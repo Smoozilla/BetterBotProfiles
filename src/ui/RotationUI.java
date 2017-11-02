@@ -148,6 +148,10 @@ public class RotationUI extends javax.swing.JPanel {
     jDrinkOkay.setText("% - Value NOT OK");
     return 0;
   }
+  
+  public boolean shouldUseMount(){
+    return jUseMount.isSelected();
+  }
 
   private void loadSettings() {
     System.out.println("Loading combat settings.");
