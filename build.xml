@@ -82,18 +82,25 @@
         <jar basedir="${build.dir}" destfile="${dist.dir}/PriestSolver.jar" includes="rotations/PriestSolver.class"/>
     </target>
 	
-    <target name="expRogue">
+    <target name="expRogue" depends="clean">
         <mkdir dir="${build.dir}"/>
-        <javac includeantruntime="false" srcdir="${src.dir}" includes="rotations/RogueSolver.java" destdir="${build.dir}" classpath="lib/libBetterBot.jar"/>
+        <javac includeantruntime="false" srcdir="${src.dir}" includes="rotations/RogueSolver.java,ui/RotationUI.java" destdir="${build.dir}" classpath="lib/libBetterBot.jar"/>
         <mkdir dir="${dist.dir}"/>
-        <jar basedir="${build.dir}" destfile="${dist.dir}/RogueSolver.jar" includes="rotations/RogueSolver.class"/>
+        <jar basedir="${build.dir}" destfile="${dist.dir}/RogueSolver.jar" includes="rotations/**/*.class,ui/**/*.class"/>
+    </target>
+    
+    <target name="expRogueCombat" depends="clean">
+        <mkdir dir="${build.dir}"/>
+        <javac includeantruntime="false" srcdir="${src.dir}" includes="rotations/RogueCombatSolver.java,ui/RotationUI.java" destdir="${build.dir}" classpath="lib/libBetterBot.jar"/>
+        <mkdir dir="${dist.dir}"/>
+        <jar basedir="${build.dir}" destfile="${dist.dir}/RogueCombatSolver.jar" includes="rotations/**/*.class,ui/**/*.class"/>
     </target>
 	
-    <target name="expShamanEnh">
+    <target name="expShamanEnh" depends="clean">
         <mkdir dir="${build.dir}"/>
         <javac includeantruntime="false" srcdir="${src.dir}" includes="rotations/ShamanEnhancementSolver.java,ui/RotationUI.java" destdir="${build.dir}" classpath="lib/libBetterBot.jar"/>
         <mkdir dir="${dist.dir}"/>
-        <jar basedir="${build.dir}" destfile="${dist.dir}/ShamanEnhancementSolver.jar" includes="rotations/ShamanEnhancementSolver.class,ui/RotationUI.class"/>
+        <jar basedir="${build.dir}" destfile="${dist.dir}/ShamanEnhancementSolver.jar" includes="rotations/**/*.class,ui/**/*.class"/>
     </target>
 
     <target name="expShamanEle">

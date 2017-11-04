@@ -22,7 +22,7 @@ import ui.RotationUI;
  *
  * @author TheCrux
  */
-public class RogueSolver implements RotationSolver, ICommonSettingFunctions {
+public class RogueCombatSolver implements RotationSolver, ICommonSettingFunctions {
 
   BetterBot mBot;
   RotationUI mUI;
@@ -43,16 +43,16 @@ public class RogueSolver implements RotationSolver, ICommonSettingFunctions {
   // Spells
   int mKick[] = {1766, 1767, 1768, 1769};
   int mVanish[] = {1856, 1857};
-  int mCheapShot = 6409;
 
   // Buffs
   int mStealth[] = {1784, 1785, 1786, 1787};
   int mEvasion = 5277;
   int mSliceAndDice[] = {5171, 6774};
+  int mBladeFlurry = 13877;
+  int mAdrenalineRush = 13750;
 
   // Poisons
   String mPoisonNames[] = {
-    "Crippling Poison", "Crippling Poison II",
     "Deadly Poison", "Deadly Poison II", "Deadly Poison III", "Deadly Poison IV", "Deadly Poison V",
     "Instant Poison", "Instant Poison II", "Instant Poison III", "Instant Poison IV", "Instant Poison V", "Instant Poison VI",
     "Mind-numbing Poison", "Mind-numbing Poison II", "Mind-numbing Poison III",
@@ -86,10 +86,9 @@ public class RogueSolver implements RotationSolver, ICommonSettingFunctions {
     // PvP - Alliance
     22717, 22723, 22720, 22719, 23510,
     // Special (mostly Dungeons)
-    24252, 17450, 24242, 16084, 18991, 18992, 17229
-  };
+    24252, 17450, 24242, 16084, 18991, 18992, 17229};
 
-  public RogueSolver(BetterBot bot) {
+  public RogueCombatSolver(BetterBot bot) {
     mBot = bot;
     mUI = new RotationUI(this);
     mMove = mBot.getMovement();
@@ -132,7 +131,7 @@ public class RogueSolver implements RotationSolver, ICommonSettingFunctions {
     mUI.repaint();
     // =========================
 
-    System.out.println("TheCrux's Rogue script started");
+    System.out.println("TheCrux's Combat Rogue script started");
 
     mEatPercent = mUI.getEatPercentage();
     mEating = false;
@@ -164,10 +163,10 @@ public class RogueSolver implements RotationSolver, ICommonSettingFunctions {
     int attackerAmount = mBot.getAttackers().size();
 
     // Vanish
-    if (mPlayerLevel >= 22 && mPlayer.getHealthFloat() <= 0.1f && (targetHealth >= 0.2f || attackerAmount > 1)
-            && mPlayer.inCombat() && mBot.getInventory().getItemCount(5140) > 0 && !mBot.anyOnCD(mVanish)) {
+    if (mPlayerLevel >= 22 && mPlayer.getHealthFloat() < 0.1f && (targetHealth > 0.2f || attackerAmount > 1)
+            && mPlayer.inCombat() && mBot.getInventory().getItemCount(5140) > 0 && !mBot.anyOnCD(mVanish) && !mMove.isMoving()) {
       mKeyboard.type('5');
-      mMove.walkPath(mMove.getBacktrackPath(), 80);
+      mMove.walkPath(mMove.getBacktrackPath(), 5);
       return;
     }
 
@@ -176,13 +175,26 @@ public class RogueSolver implements RotationSolver, ICommonSettingFunctions {
       if (mPlayerLevel >= 12 && u.isCasting() && u.getManaMax() > 0 && !mBot.anyOnCD(mKick)) {
         mKeyboard.type('6');
       }
+
       // Evasion
       if (mPlayerLevel >= 8 && (mPlayer.getHealthFloat() <= 0.5f || attackerAmount > 1) && !mBot.anyOnCD(mEvasion)) {
         mKeyboard.type('8');
       }
 
+      // Blade Flurry
+      if (mPlayerLevel >= 30 && attackerAmount > 1 && energyValue >= 25 && !mBot.anyOnCD(mBladeFlurry)) {
+        switchActionBar(2);
+        mKeyboard.type('2');
+        switchActionBar(1);
+      }
+      // Adrenaline Rush
+      else if (mPlayerLevel >= 40 && attackerAmount > 1 && !mBot.anyOnCD(mAdrenalineRush)) {
+        switchActionBar(2);
+        mKeyboard.type('3');
+        switchActionBar(1);
+      }
       // Slice and Dice
-      if (mPlayerLevel >= 10 && energyValue >= 25 && !mPlayer.hasAura(mSliceAndDice) && comboPoints > 0) {
+      else if (mPlayerLevel >= 10 && energyValue >= 25 && !mPlayer.hasAura(mSliceAndDice) && comboPoints > 0) {
         mKeyboard.type('3');
       }
       // Eviscerate		
@@ -205,12 +217,12 @@ public class RogueSolver implements RotationSolver, ICommonSettingFunctions {
   @Override
   public void pull(Unit u) {
     // Try to use Cheap Shot
-    if (mPlayerLevel >= 26 && !mBot.anyOnCD(mCheapShot)) {
+    if (mPlayerLevel >= 26) {
       mKeyboard.type('1');
     }
-    // Try to Backstap / Ambush / Garrote
-    else if (mPlayerLevel >= 4) {
-      mKeyboard.type('3');
+    else if (mPlayerLevel >= 14) {
+      // Try to use Garrote
+      mKeyboard.type("3");
     }
     combat(u);
   }
@@ -234,8 +246,8 @@ public class RogueSolver implements RotationSolver, ICommonSettingFunctions {
       }
       mEating = true;
     }
-    
-    if(mPlayer.isCasting()){
+
+    if (mPlayer.isCasting()) {
       return;
     }
 
@@ -277,7 +289,7 @@ public class RogueSolver implements RotationSolver, ICommonSettingFunctions {
         }
       }
       else {
-        //charges
+        // charges
         if (bits[1].contains("min")) {
           time = Integer.parseInt(bits[1].split("\\ min")[0]) * 60000;
         }

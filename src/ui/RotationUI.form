@@ -21,9 +21,9 @@
                   <Group type="102" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                          <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
+                          <Component id="jEatLabel" min="-2" max="-2" attributes="0"/>
                           <Component id="jDrinkPercentage" alignment="0" max="32767" attributes="0"/>
-                          <Component id="jLabel3" alignment="0" max="32767" attributes="0"/>
+                          <Component id="jDrinkLabel" alignment="0" max="32767" attributes="0"/>
                           <Component id="jUseMount" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="jEatPercentage" alignment="0" max="32767" attributes="0"/>
                       </Group>
@@ -35,7 +35,7 @@
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace pref="137" max="32767" attributes="0"/>
-                      <Component id="jLabel4" min="-2" max="-2" attributes="0"/>
+                      <Component id="jTitle" min="-2" max="-2" attributes="0"/>
                   </Group>
               </Group>
               <EmptySpace pref="140" max="32767" attributes="0"/>
@@ -46,16 +46,16 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="jLabel4" min="-2" max="-2" attributes="0"/>
+              <Component id="jTitle" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
+              <Component id="jEatLabel" min="-2" max="-2" attributes="0"/>
               <EmptySpace min="-2" pref="2" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="jEatPercentage" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="jEatOkay" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="jLabel3" min="-2" max="-2" attributes="0"/>
+              <Component id="jDrinkLabel" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="jDrinkPercentage" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -74,7 +74,7 @@
         <Property name="text" type="java.lang.String" value="40"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="jLabel2">
+    <Component class="javax.swing.JLabel" name="jEatLabel">
       <Properties>
         <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
           <ComponentRef name="jEatPercentage"/>
@@ -87,7 +87,7 @@
         <Property name="text" type="java.lang.String" value="40"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="jLabel3">
+    <Component class="javax.swing.JLabel" name="jDrinkLabel">
       <Properties>
         <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
           <ComponentRef name="jDrinkPercentage"/>
@@ -110,7 +110,7 @@
         <Property name="text" type="java.lang.String" value="%"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="jLabel4">
+    <Component class="javax.swing.JLabel" name="jTitle">
       <Properties>
         <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
           <Font name="Dialog" size="15" style="1"/>

@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JCheckBox;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
@@ -28,7 +27,9 @@ import rotations.ICommonSettingFunctions;
 public class RotationUI extends javax.swing.JPanel {
 
   RotationSolver mSolver;
-  ICommonSettingFunctions mSolverSettingsInterface; // probably pick better names for these lol 
+  ICommonSettingFunctions mSolverSettingsInterface;
+
+  HashMap<String, String> mSettings;
 
   /**
    * Creates new form RotationUI
@@ -37,13 +38,29 @@ public class RotationUI extends javax.swing.JPanel {
    */
   public RotationUI(RotationSolver solver) {
     initComponents();
-    
+
     mSolver = solver;
     if (mSolver instanceof ICommonSettingFunctions) {
       mSolverSettingsInterface = (ICommonSettingFunctions) mSolver;
     }
-    
+
+    mSettings = new HashMap<>();
     loadSettings();
+
+    if (mSettings.size() > 0) {
+      String eat = mSettings.get("eatPercentage");
+      if (eat != null) {
+        jEatPercentage.setText(eat);
+      }
+      String drink = mSettings.get("drinkPercentage");
+      if (drink != null) {
+        jDrinkPercentage.setText(drink);
+      }
+      String mount = mSettings.get("useMount");
+      if (mount != null) {
+        jUseMount.setSelected(Boolean.valueOf(mount));
+      }
+    }
 
     DocumentListener drinkListener = new DocumentListener() {
       @Override
@@ -51,6 +68,7 @@ public class RotationUI extends javax.swing.JPanel {
         if (mSolverSettingsInterface != null) {
           mSolverSettingsInterface.setDrinkPercentage(getDrinkPercentage());
         }
+        mSettings.put("drinkPercentage", jDrinkPercentage.getText());
         saveSettings();
       }
 
@@ -59,6 +77,7 @@ public class RotationUI extends javax.swing.JPanel {
         if (mSolverSettingsInterface != null) {
           mSolverSettingsInterface.setDrinkPercentage(getDrinkPercentage());
         }
+        mSettings.put("drinkPercentage", jDrinkPercentage.getText());
         saveSettings();
       }
 
@@ -67,17 +86,19 @@ public class RotationUI extends javax.swing.JPanel {
         if (mSolverSettingsInterface != null) {
           mSolverSettingsInterface.setDrinkPercentage(getDrinkPercentage());
         }
+        mSettings.put("drinkPercentage", jDrinkPercentage.getText());
         saveSettings();
       }
     };
     jDrinkPercentage.getDocument().addDocumentListener(drinkListener);
-    
+
     DocumentListener eatListener = new DocumentListener() {
       @Override
       public void insertUpdate(DocumentEvent e) {
         if (mSolverSettingsInterface != null) {
           mSolverSettingsInterface.setEatPercentage(getEatPercentage());
         }
+        mSettings.put("eatPercentage", jEatPercentage.getText());
         saveSettings();
       }
 
@@ -86,6 +107,7 @@ public class RotationUI extends javax.swing.JPanel {
         if (mSolverSettingsInterface != null) {
           mSolverSettingsInterface.setEatPercentage(getEatPercentage());
         }
+        mSettings.put("eatPercentage", jEatPercentage.getText());
         saveSettings();
       }
 
@@ -94,12 +116,14 @@ public class RotationUI extends javax.swing.JPanel {
         if (mSolverSettingsInterface != null) {
           mSolverSettingsInterface.setEatPercentage(getEatPercentage());
         }
+        mSettings.put("eatPercentage", jEatPercentage.getText());
         saveSettings();
       }
     };
     jEatPercentage.getDocument().addDocumentListener(eatListener);
 
     ChangeListener checkListener = (ChangeEvent e) -> {
+      mSettings.put("useMount", jUseMount.isSelected() ? "true" : "false");
       saveSettings();
     };
     jUseMount.addChangeListener(checkListener);
@@ -148,8 +172,8 @@ public class RotationUI extends javax.swing.JPanel {
     jDrinkOkay.setText("% - Value NOT OK");
     return 0;
   }
-  
-  public boolean shouldUseMount(){
+
+  public boolean shouldUseMount() {
     return jUseMount.isSelected();
   }
 
@@ -160,7 +184,6 @@ public class RotationUI extends javax.swing.JPanel {
     try {
       in = new DataInputStream(new FileInputStream("./combatSettings.bin"));
 
-      HashMap<String, String> prop = new HashMap<>();
       int propcount = in.read();
       for (int i = 0; i < propcount; i++) {
         int kl = in.read();
@@ -169,12 +192,7 @@ public class RotationUI extends javax.swing.JPanel {
         String key = new String(b);
         b = new byte[in.readInt()];
         in.readFully(b);
-        prop.put(key, new String(b));
-      }
-      if (prop.size() > 0) {
-        jUseMount.setSelected(Boolean.valueOf(prop.get("useMount")));
-        jEatPercentage.setText(prop.get("eatPercentage"));
-        jDrinkPercentage.setText(prop.get("drinkPercentage"));
+        mSettings.put(key, new String(b));
       }
     }
     catch (IOException ex) {
@@ -183,25 +201,75 @@ public class RotationUI extends javax.swing.JPanel {
     }
   }
 
+  public String getStringProp(String key) {
+    String ret = mSettings.get(key);
+    if (ret != null) {
+      return ret;
+    }
+    return "";
+  }
+  
+  public boolean getBoolProp(String key){
+    String ret = mSettings.get(key);
+    return ret != null && ret.equals("true");
+  }
+  
+  public int getIndexProp(String key){
+    String ret = mSettings.get(key);
+    if(ret != null){
+      return Integer.parseInt(ret);
+    }
+    return 0;
+  }
+
+  /**
+   * Sets or adds a property to the settings map and saves it
+   *
+   * @param key the key in the map
+   * @param value the value
+   */
+  public void setProp(String key, boolean value) {
+    mSettings.put(key, value ? "true" : "false");
+    saveSettings();
+  }
+
+  /**
+   * Sets or adds a property to the settings map and saves it
+   *
+   * @param key the key in the map
+   * @param value the value
+   */
+  public void setProp(String key, String value) {
+    mSettings.put(key, value);
+    saveSettings();
+  }
+  
+  /**
+   * Sets or adds a property to the settings map and saves it
+   *
+   * @param key the key in the map
+   * @param value the value
+   */
+  public void setProp(String key, int value) {
+    mSettings.put(key, "" + value);
+    saveSettings();
+  }
+  
+  
+
   private void saveSettings() {
     System.out.println("Saving combat settings.");
 
     DataOutputStream out;
     try {
       out = new DataOutputStream(new FileOutputStream(("./combatSettings.bin")));
-      HashMap<String, String> props = new HashMap<>();
 
-      props.put("eatPercentage", jEatPercentage.getText());
-      props.put("drinkPercentage", jDrinkPercentage.getText());
-
-      props.put("useMount", jUseMount.isSelected() ? "true" : "false");
-
-      out.write(props.size());
-      for (String s : props.keySet()) {
+      out.write(mSettings.size());
+      for (String s : mSettings.keySet()) {
         byte[] b = s.getBytes();
         out.write(b.length);
         out.write(b);
-        b = props.get(s).getBytes();
+        b = mSettings.get(s).getBytes();
         out.writeInt(b.length);
         out.write(b);
       }
@@ -224,23 +292,23 @@ public class RotationUI extends javax.swing.JPanel {
   private void initComponents() {
 
     jEatPercentage = new javax.swing.JTextField();
-    jLabel2 = new javax.swing.JLabel();
+    jEatLabel = new javax.swing.JLabel();
     jDrinkPercentage = new javax.swing.JTextField();
-    jLabel3 = new javax.swing.JLabel();
+    jDrinkLabel = new javax.swing.JLabel();
     jUseMount = new javax.swing.JCheckBox();
     jEatOkay = new javax.swing.JLabel();
     jDrinkOkay = new javax.swing.JLabel();
-    jLabel4 = new javax.swing.JLabel();
+    jTitle = new javax.swing.JLabel();
 
     jEatPercentage.setText("40");
 
-    jLabel2.setLabelFor(jEatPercentage);
-    jLabel2.setText("Eat Percentage");
+    jEatLabel.setLabelFor(jEatPercentage);
+    jEatLabel.setText("Eat Percentage");
 
     jDrinkPercentage.setText("40");
 
-    jLabel3.setLabelFor(jDrinkPercentage);
-    jLabel3.setText("Drink Percentage");
+    jDrinkLabel.setLabelFor(jDrinkPercentage);
+    jDrinkLabel.setText("Drink Percentage");
 
     jUseMount.setText("Use Mount");
 
@@ -248,8 +316,8 @@ public class RotationUI extends javax.swing.JPanel {
 
     jDrinkOkay.setText("%");
 
-    jLabel4.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
-    jLabel4.setText("Rotation Settings");
+    jTitle.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+    jTitle.setText("Rotation Settings");
 
     javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
     this.setLayout(layout);
@@ -260,9 +328,9 @@ public class RotationUI extends javax.swing.JPanel {
           .addGroup(layout.createSequentialGroup()
             .addContainerGap()
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-              .addComponent(jLabel2)
+              .addComponent(jEatLabel)
               .addComponent(jDrinkPercentage)
-              .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+              .addComponent(jDrinkLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
               .addComponent(jUseMount)
               .addComponent(jEatPercentage))
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -271,22 +339,22 @@ public class RotationUI extends javax.swing.JPanel {
               .addComponent(jDrinkOkay)))
           .addGroup(layout.createSequentialGroup()
             .addContainerGap(137, Short.MAX_VALUE)
-            .addComponent(jLabel4)))
+            .addComponent(jTitle)))
         .addContainerGap(140, Short.MAX_VALUE))
     );
     layout.setVerticalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
       .addGroup(layout.createSequentialGroup()
         .addContainerGap()
-        .addComponent(jLabel4)
+        .addComponent(jTitle)
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-        .addComponent(jLabel2)
+        .addComponent(jEatLabel)
         .addGap(2, 2, 2)
         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
           .addComponent(jEatPercentage, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
           .addComponent(jEatOkay))
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-        .addComponent(jLabel3)
+        .addComponent(jDrinkLabel)
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
           .addComponent(jDrinkPercentage, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -297,18 +365,47 @@ public class RotationUI extends javax.swing.JPanel {
     );
   }// </editor-fold>//GEN-END:initComponents
 
-  public JCheckBox getUseMountComp() {
-    return jUseMount;
+  public void removeMountSettings() {
+    java.awt.EventQueue.invokeLater(() -> {
+      System.out.println("Removing useMount UI");
+      jUseMount.setVisible(false);
+    });
   }
 
+  public void removeDrinkingSettings() {
+    java.awt.EventQueue.invokeLater(() -> {
+      System.out.println("Removing drinking UI");
+      jDrinkLabel.setVisible(false);
+      jDrinkPercentage.setVisible(false);
+      jDrinkOkay.setVisible(false);
+      /*
+      this.remove(jDrinkLabel);
+      this.remove(jDrinkPercentage);
+      this.remove(jDrinkOkay);
+      this.revalidate();
+      this.repaint();
+       */
+    });
+  }
+
+  public void removeEatingSettings() {
+    java.awt.EventQueue.invokeLater(() -> {
+      System.out.println("Removing eating UI");
+      jEatLabel.setVisible(false);
+      jEatPercentage.setVisible(false);
+      jEatOkay.setVisible(false);
+    });
+  }
+
+
   // Variables declaration - do not modify//GEN-BEGIN:variables
+  private javax.swing.JLabel jDrinkLabel;
   private javax.swing.JLabel jDrinkOkay;
   private javax.swing.JTextField jDrinkPercentage;
+  private javax.swing.JLabel jEatLabel;
   private javax.swing.JLabel jEatOkay;
   private javax.swing.JTextField jEatPercentage;
-  private javax.swing.JLabel jLabel2;
-  private javax.swing.JLabel jLabel3;
-  private javax.swing.JLabel jLabel4;
+  private javax.swing.JLabel jTitle;
   private javax.swing.JCheckBox jUseMount;
   // End of variables declaration//GEN-END:variables
 }
