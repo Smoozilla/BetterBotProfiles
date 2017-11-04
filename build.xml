@@ -110,11 +110,11 @@
         <jar basedir="${build.dir}" destfile="${dist.dir}/ShamanElementalSolver.jar" includes="rotations/ShamanElementalSolver.class"/>
     </target>
 	
-    <target name="expWarrior">
+    <target name="expWarrior" depends="clean">
         <mkdir dir="${build.dir}"/>
-        <javac includeantruntime="false" srcdir="${src.dir}" includes="rotations/WarriorSolver.java" destdir="${build.dir}" classpath="lib/libBetterBot.jar"/>
+        <javac includeantruntime="false" srcdir="${src.dir}" includes="rotations/WarriorSolver.java,ui/RotationUI.java" destdir="${build.dir}" classpath="lib/libBetterBot.jar"/>
         <mkdir dir="${dist.dir}"/>
-        <jar basedir="${build.dir}" destfile="${dist.dir}/WarriorSolver.jar" includes="rotations/WarriorSolver.class"/>
+        <jar basedir="${build.dir}" destfile="${dist.dir}/WarriorSolver.jar" includes="rotations/**/*.class,ui/**/*.class"/>
     </target>
 	
     <target name="createAll" depends="expRotation,expDruid,expDruidFeral,expHunter,expHunterBeast,expMageFrost,expPaladin,expPriest,expRogue,expShamanEnh,expShamanEle,expWarrior"/>
