@@ -74,8 +74,11 @@ public class DruidFeralSolver implements RotationSolver, ICommonSettingFunctions
     mKeyboard = bot.getKeyboard();
     mPlayerLevel = mPlayer.getLevel();
 
-    //TODO: Mount usage is irrelevant since Druids have travelform
-    //mUI.remove(mUI.getUseMountComp());
+    // Mount usage is irrelevant since Druids have travelform
+    mUI.removeMountSettings();
+    // Eating is irrelevant since Druids can heal themself
+    mUI.removeEatingSettings();
+
     System.out.println("TheCrux's Feral Druid script started");
 
     mDrinkPercentage = mUI.getDrinkPercentage();
