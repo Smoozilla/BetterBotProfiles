@@ -204,7 +204,7 @@ public class RogueCombatSolver implements RotationSolver, ICommonSettingFunction
         mKeyboard.type('2');
       }
       // Sinister Strike OR Hemorrhage
-      else if (energyValue >= 45) {
+      else if (energyValue >= 45 || (mPlayerLevel >= 11 && energyValue >= 40)) {
         mKeyboard.type('4');
       }
       // Melee Attack
