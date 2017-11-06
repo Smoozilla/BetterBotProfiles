@@ -26,18 +26,18 @@
         <jar basedir="${build.dir}" destfile="${dist.dir}/Rotations.jar"/>
     </target>
 		
-    <target name="expDruid">
+    <target name="expDruid" depends="clean">
         <mkdir dir="${build.dir}"/>
-        <javac includeantruntime="false" srcdir="${src.dir}" includes="rotations/DruidSolver.java" destdir="${build.dir}" classpath="lib/libBetterBot.jar"/>
+        <javac includeantruntime="false" srcdir="${src.dir}" includes="rotations/DruidSolver.java,ui/RotationUI.java" destdir="${build.dir}" classpath="lib/libBetterBot.jar"/>
         <mkdir dir="${dist.dir}"/>
-        <jar basedir="${build.dir}" destfile="${dist.dir}/DruidSolver.jar" includes="rotations/DruidSolver.class"/>
+        <jar basedir="${build.dir}" destfile="${dist.dir}/DruidSolver.jar" includes="rotations/**/*.class,ui/**/*.class"/>
     </target>	
 	
-    <target name="expDruidBalance">
+    <target name="expDruidBalance" depends="clean">
         <mkdir dir="${build.dir}"/>
         <javac includeantruntime="false" srcdir="${src.dir}" includes="rotations/DruidBalanceSolver.java,ui/RotationUI.java" destdir="${build.dir}" classpath="lib/libBetterBot.jar"/>
         <mkdir dir="${dist.dir}"/>
-        <jar basedir="${build.dir}" destfile="${dist.dir}/DruidBalanceSolver.jar" includes="rotations/DruidBalanceSolver.class,ui/RotationUI.class"/>
+        <jar basedir="${build.dir}" destfile="${dist.dir}/DruidBalanceSolver.jar" includes="rotations/**/*.class,ui/**/*.class"/>
     </target>
 
     <target name="expDruidFeral" depends="clean">

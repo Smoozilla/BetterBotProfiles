@@ -5,15 +5,15 @@ import com.betterbot.api.pub.Database.Vendor;
 import com.betterbot.api.pub.Keyboard;
 import com.betterbot.api.pub.Unit;
 import com.betterbot.api.pub.Vector3f;
-import javax.swing.JComponent;
 import com.betterbot.api.pub.RotationSolver;
+import javax.swing.JComponent;
 import ui.RotationUI;
 
 /**
  *
  * @author TheCrux
  */
-public class DruidFeralSolver implements RotationSolver, ICommonSettingFunctions {
+public class DruidBalanceSolver implements RotationSolver, ICommonSettingFunctions {
 
   BetterBot mBot;
   RotationUI mUI;
@@ -26,18 +26,13 @@ public class DruidFeralSolver implements RotationSolver, ICommonSettingFunctions
 
   // Everything sorted by rank!
   // Spells
-  int mTigersFury[] = {5217, 6793, 9845, 9846};
+  int mMoonfire[] = {8921, 8924, 8925, 8926, 8927, 8928, 8929, 9833, 9834, 9835};
 
   // Buffs
   int mMarkOfTheWild[] = {1126, 5232, 6756, 5234, 8907, 9884, 9885};
   int mThorns[] = {467, 782, 1075, 8914, 9756, 9910};
-  int mCatForm = 768;
-  int mProwl[] = {5215, 6783, 9913};
   int mTravelForm = 783;
-
-  // Debuffs
-  int mRip[] = {1079, 9492, 9493, 9752, 9894, 9896};
-  int mRake[] = {1822, 1823, 1824, 9904};
+  int mMoonkinForm = 24858;
 
   // Drinking Buffs
   int mDrinkingBuffs[] = {430, 431, 432, 1133, 1135, 1137, 10250, 22734, 24355, 29007};
@@ -67,7 +62,7 @@ public class DruidFeralSolver implements RotationSolver, ICommonSettingFunctions
     // Special (mostly Dungeons)
     24252, 17450, 24242, 16084, 18991, 18992, 17229};
 
-  public DruidFeralSolver(BetterBot bot) {
+  public DruidBalanceSolver(BetterBot bot) {
     mBot = bot;
     mUI = new RotationUI(this);
     mPlayer = bot.getPlayer();
@@ -79,7 +74,7 @@ public class DruidFeralSolver implements RotationSolver, ICommonSettingFunctions
     // Eating is irrelevant since Druids can heal themself
     mUI.removeEatingSettings();
 
-    System.out.println("TheCrux's Feral Druid script started");
+    System.out.println("TheCrux's Balance Druid script started");
 
     mDrinkPercentage = mUI.getDrinkPercentage();
     mDrinking = false;
@@ -97,57 +92,26 @@ public class DruidFeralSolver implements RotationSolver, ICommonSettingFunctions
     }
 
     // Player at good health
-    if (mPlayer.getHealthFloat() > 0.6f || (mBot.getAttackers().size() == 1 && u.getHealth() <= 0.6f)) {
+    if (mPlayer.getHealthFloat() > 0.60f) {
 
-      // Not in Catform
-      if (!mPlayer.hasAura(mCatForm)) {
-        // Not enough mana for Catform -> wait and do Melee Attack
-        if (mPlayer.getManaFloat() <= 0.2f) {
-          mKeyboard.type('7');
-          return;
-        }
-        mKeyboard.type('6');
+      float manaValue = mPlayer.getManaFloat();
+      float targetDistance = u.getDistance();
+
+      // Moonfire
+      if (mPlayerLevel >= 4 && targetDistance < 30 && u.getHealthFloat() > 0.2f && !u.hasAura(mMoonfire)) {
+        mKeyboard.type('2');
       }
-      // Catform skills 
-      else {
-        int energyValue = mPlayer.getEnergy();
-        int comboPoints = mBot.getComboPoints();
-        float targetHealth = u.getHealthFloat();
-
-        // Tiger's Fury
-        if (mPlayerLevel >= 24 && mBot.getAttackers().size() > 1 && energyValue >= 30 && !mBot.anyOnCD(mTigersFury)) {
-          mKeyboard.type('5');
-        }
-        // Rip
-        else if (!u.hasAura(mRip) && energyValue >= 30 && ((comboPoints == 3 && targetHealth >= 0.3f)
-                || (comboPoints == 4 && targetHealth >= 0.35f) || comboPoints == 5)) {
-          mKeyboard.type('3');
-        }
-        // Ferocious Bite
-        else if (mPlayerLevel >= 32 && energyValue >= 35 && ((comboPoints == 3 && targetHealth <= 0.25f)
-                || (comboPoints == 4 && targetHealth <= 0.3f) || comboPoints == 5)) {
-          mKeyboard.type('2');
-        }
-        // Rake
-        else if (mPlayerLevel >= 24 && energyValue >= 40 && !u.hasAura(mRake)) {
-          mKeyboard.type('1');
-        }
-        // Claw
-        else if (energyValue >= 40) {
-          mKeyboard.type('4');
-        }
-        // Melee Attack
-        else if (u.getDistance() <= 5) {
-          mKeyboard.type('7');
-        }
+      // Wrath
+      else if (targetDistance < 30 && manaValue >= 0.2f) {
+        mKeyboard.type('4');
+      }
+      // Melee Attack
+      else if (targetDistance <= 5) {
+        mKeyboard.type('7');
       }
     }
     // Player below 60% Health
     else {
-      // Remove Catform
-      if (mPlayer.hasAura(mCatForm)) {
-        mKeyboard.type('6');
-      }
       // Healing Touch
       if (mPlayer.getManaFloat() >= 0.2f) {
         mKeyboard.type('3');
@@ -158,9 +122,13 @@ public class DruidFeralSolver implements RotationSolver, ICommonSettingFunctions
   @Override
   public void pull(Unit u) {
     if (isFullBuffed()) {
-      // Try to use Ravage
-      if (mPlayerLevel >= 32 && mPlayer.getEnergy() >= 60) {
-        mKeyboard.type('2');
+      // Pull with Starfire
+      if (mPlayerLevel >= 20) {
+        mKeyboard.type('5');
+      }
+      // Pull with Wrath
+      else {
+        mKeyboard.type('4');
       }
       combat(u);
     }
@@ -186,39 +154,27 @@ public class DruidFeralSolver implements RotationSolver, ICommonSettingFunctions
   boolean isFullBuffed() {
 
     // Mark of the Wild
-    if (!mPlayer.hasAura(mMarkOfTheWild)) {
-      // Remove Catform
-      if (mPlayer.hasAura(mCatForm)) {
-        mKeyboard.type('6');
-      }
+    if (mPlayerLevel >= 2 && !mPlayer.hasAura(mMarkOfTheWild)) {
       mKeyboard.type('9');
       return false;
     }
     // Thorns
-    if (!mPlayer.hasAura(mThorns)) {
-      // Remove Catform
-      if (mPlayer.hasAura(mCatForm)) {
-        mKeyboard.type('6');
-      }
+    if (mPlayerLevel >= 6 && !mPlayer.hasAura(mThorns)) {
       mKeyboard.type('8');
       return false;
     }
-    // Catform
-    if (!mPlayer.hasAura(mCatForm)) {
+    // Moonkin Form
+    if (mPlayerLevel >= 40 && !mPlayer.hasAura(mMoonkinForm)) {
       mKeyboard.type('6');
-      return false;
     }
+
     return true;
   }
 
   void drink() {
+
     if (mPlayer.getManaFloat() < mDrinkPercentage) {
       mDrinking = true;
-    }
-
-    // Remove Catform
-    if (mDrinking && mPlayer.hasAura(mCatForm)) {
-      mKeyboard.type('6');
     }
 
     if (mDrinking && !mPlayer.hasAura(mDrinkingBuffs) && mPlayer.getManaFloat() < mDrinkPercentage + 0.05f) {
@@ -235,7 +191,7 @@ public class DruidFeralSolver implements RotationSolver, ICommonSettingFunctions
 
   @Override
   public int getPullDistance(Unit u) {
-    return 5;
+    return 30;
   }
 
   long waitFlag = System.currentTimeMillis();
@@ -247,15 +203,7 @@ public class DruidFeralSolver implements RotationSolver, ICommonSettingFunctions
     // Slow dooooown!
     if (now - waitFlag > 500) {
       waitFlag = now;
-
-      // Remove Travel Form / Mount
-      if (mPlayerLevel >= 30 && (mPlayer.hasAura(mTravelForm) || mPlayer.hasAura(mMounts))) {
-        mKeyboard.type('-');
-      }
-      // Prowl
-      if (isFullBuffed() && u.getDistance() < 25 && !mPlayer.hasAura(mProwl)) {
-        mKeyboard.type('9');
-      }
+      isFullBuffed();
     }
   }
 
@@ -275,13 +223,8 @@ public class DruidFeralSolver implements RotationSolver, ICommonSettingFunctions
     // Remove Travel Form / Mount
     if (mPlayerLevel >= 30 && (mPlayer.hasAura(mTravelForm) || mPlayer.hasAura(mMounts))) {
       mKeyboard.type('-');
+      return true;
     }
-
-    // Remove Catform
-    if (mPlayer.hasAura(mCatForm)) {
-      mKeyboard.type('6');
-    }
-
     return false;
   }
 
@@ -302,9 +245,10 @@ public class DruidFeralSolver implements RotationSolver, ICommonSettingFunctions
     }
 
     // Travel Form / Mount
-    if (mPlayerLevel >= 30 && !mPlayer.hasAura(mTravelForm) && !mPlayer.hasAura(mMounts)) {
+    if (mPlayerLevel >= 30 && (!mPlayer.hasAura(mTravelForm) || !mPlayer.hasAura(mMounts))) {
       mKeyboard.type('-');
     }
+
     return false;
   }
 
