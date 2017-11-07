@@ -8,23 +8,19 @@ import com.betterbot.api.pub.Vector3f;
 import javax.swing.JComponent;
 import com.betterbot.api.pub.RotationSolver;
 import java.awt.event.KeyEvent;
-import javax.swing.JCheckBox;
-import javax.swing.event.ChangeEvent;
 import ui.RotationUI;
 
 /**
  *
  * @author TheCrux
  */
-public class PriestSolver implements RotationSolver, ICommonSettingFunctions {
+public class PriestShadowSolver implements RotationSolver, ICommonSettingFunctions {
 
   BetterBot mBot;
   RotationUI mUI;
   Keyboard mKeyboard;
   Unit mPlayer;
   int mActionBar;
-
-  JCheckBox jUseLowMana;
 
   float mDrinkPercentage;
   boolean mDrinking;
@@ -38,6 +34,7 @@ public class PriestSolver implements RotationSolver, ICommonSettingFunctions {
   int mPWFortitude[] = {1243, 1244, 1245, 2791, 10937, 10938};
   int mPWShield[] = {17, 592, 600, 3747, 6065, 6066, 10898, 10899, 10900, 10901};
   int mInnerFire[] = {588, 7128, 602, 1006, 10951, 10952};
+  int mShadowForm = 15473;
 
   // Debuffs
   int mWeakenedSoul = 6788;
@@ -71,7 +68,7 @@ public class PriestSolver implements RotationSolver, ICommonSettingFunctions {
     // Special (mostly Dungeons)
     24252, 17450, 24242, 16084, 18991, 18992, 17229};
 
-  public PriestSolver(BetterBot bot) {
+  public PriestShadowSolver(BetterBot bot) {
     mBot = bot;
     mUI = new RotationUI(this);
     mPlayer = bot.getPlayer();
@@ -79,24 +76,9 @@ public class PriestSolver implements RotationSolver, ICommonSettingFunctions {
     mPlayerLevel = mPlayer.getLevel();
     mActionBar = 1;
 
-    // ====== UI Settings ======
     mUI.removeEatingSettings();
 
-    jUseLowMana = new JCheckBox();
-    jUseLowMana.setText("Low mana rotation");
-    jUseLowMana.setSelected(mUI.getBoolProp("lowManaRotation"));
-    jUseLowMana.setBounds(12, 110, 150, 30);
-
-    jUseLowMana.addChangeListener((ChangeEvent e) -> {
-      mUI.setProp("lowManaRotation", jUseLowMana.isSelected());
-    });
-    mUI.add(jUseLowMana);
-
-    mUI.revalidate();
-    mUI.repaint();
-    // =========================
-
-    System.out.println("TheCrux's Priest script started");
+    System.out.println("TheCrux's Shadow Priest script started");
 
     mDrinkPercentage = mUI.getDrinkPercentage();
     mDrinking = false;
@@ -128,7 +110,6 @@ public class PriestSolver implements RotationSolver, ICommonSettingFunctions {
     if (mPlayer.getHealthFloat() > 0.60f) {
 
       float manaValue = mPlayer.getManaFloat();
-      boolean lowManaRota = jUseLowMana.isSelected();
 
       float targetHealth = u.getHealthFloat();
 
@@ -142,11 +123,15 @@ public class PriestSolver implements RotationSolver, ICommonSettingFunctions {
         mKeyboard.type('2');
       }
       // Mind Blast
-      else if (mPlayerLevel >= 10 && !mBot.anyOnCD(mMindBlast) && !lowManaRota && manaValue >= 0.2f && targetHealth > 0.15f) {
+      else if (mPlayerLevel >= 10 && !mBot.anyOnCD(mMindBlast) && manaValue >= 0.2f && targetHealth > 0.15f) {
         mKeyboard.type('5');
       }
+      // Mind Flay
+      else if (mPlayerLevel >= 20 && (targetHealth < 0.1f || mPlayerLevel >= 40) && manaValue > 0.15f) {
+        mKeyboard.type('1');
+      }
       // Smite
-      else if (manaValue > 0.1f && !lowManaRota) {
+      else if (manaValue > 0.1f && !mPlayer.hasAura(mShadowForm)) {
         mKeyboard.type('4');
       }
       // Wand OR Melee Attack
@@ -158,6 +143,10 @@ public class PriestSolver implements RotationSolver, ICommonSettingFunctions {
     else {
       // (Lesser) Heal
       if (mPlayer.getManaFloat() > 0.2f) {
+        // Remove Shadowform
+        if (mPlayer.hasAura(mShadowForm)) {
+          mKeyboard.type('9');
+        }
         mKeyboard.type('3');
       }
     }
@@ -188,6 +177,12 @@ public class PriestSolver implements RotationSolver, ICommonSettingFunctions {
     }
 
     if (mPlayer.isCasting()) {
+      return true;
+    }
+
+    // Remove Shadowform
+    if (mPlayerLevel >= 40 && mPlayer.hasAura(mShadowForm)) {
+      mKeyboard.type('9');
       return true;
     }
 
@@ -223,6 +218,12 @@ public class PriestSolver implements RotationSolver, ICommonSettingFunctions {
             && !mPlayer.hasAura(mWeakenedSoul)) {
       mKeyboard.type('6');
     }
+
+    // Shadow Form
+    if (mPlayerLevel >= 40 && !mPlayer.hasAura(mShadowForm)) {
+      mKeyboard.type('9');
+    }
+
     return true;
   }
 

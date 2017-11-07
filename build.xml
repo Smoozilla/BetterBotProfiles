@@ -75,11 +75,18 @@
         <jar basedir="${build.dir}" destfile="${dist.dir}/PaladinSolver.jar" includes="rotations/PaladinSolver.class"/>
     </target>
 	
-    <target name="expPriest">
+    <target name="expPriest" depends="clean">
         <mkdir dir="${build.dir}"/>
-        <javac includeantruntime="false" srcdir="${src.dir}" includes="rotations/PriestSolver.java" destdir="${build.dir}" classpath="lib/libBetterBot.jar"/>
+        <javac includeantruntime="false" srcdir="${src.dir}" includes="rotations/PriestSolver.java,ui/RotationUI.java" destdir="${build.dir}" classpath="lib/libBetterBot.jar"/>
         <mkdir dir="${dist.dir}"/>
-        <jar basedir="${build.dir}" destfile="${dist.dir}/PriestSolver.jar" includes="rotations/PriestSolver.class"/>
+        <jar basedir="${build.dir}" destfile="${dist.dir}/PriestSolver.jar" includes="rotations/**/*.class,ui/**/*.class"/>
+    </target>
+    
+    <target name="expPriestShadow" depends="clean">
+        <mkdir dir="${build.dir}"/>
+        <javac includeantruntime="false" srcdir="${src.dir}" includes="rotations/PriestShadowSolver.java,ui/RotationUI.java" destdir="${build.dir}" classpath="lib/libBetterBot.jar"/>
+        <mkdir dir="${dist.dir}"/>
+        <jar basedir="${build.dir}" destfile="${dist.dir}/PriestShadowSolver.jar" includes="rotations/**/*.class,ui/**/*.class"/>
     </target>
 	
     <target name="expRogue" depends="clean">
