@@ -196,7 +196,9 @@ public class WarriorSolver implements RotationSolver, ICommonSettingFunctions {
 
     if (mEating && !mPlayer.hasAura(mEatingBuffs) && !mPlayer.hasAura(mBuffFood)
             && mPlayer.getHealthFloat() < mEatPercentage + 0.05f) {
+      switchActionBar(2);
       mKeyboard.type('0'); // eat bind
+      switchActionBar(1);
       if (mFoodTimer == 0) {
         mFoodTimer = System.currentTimeMillis();
       }
