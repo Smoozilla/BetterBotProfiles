@@ -22,10 +22,10 @@ https://forum.betterbot.org/t/hunter-profile-by-thecrux/990
 https://forum.betterbot.org/t/beast-mastery-hunter-profile-by-thecrux/1042
 
 ### Marksmanship
--
+- Missing
 
 ### Survivalist
--
+- Missing
 
 ## Mage
 
@@ -33,7 +33,7 @@ https://forum.betterbot.org/t/beast-mastery-hunter-profile-by-thecrux/1042
 https://forum.betterbot.org/t/frost-mage-profile-by-thecrux/1014
 
 ### Fire
--
+- Missing
 
 ## Paladin
 
@@ -41,7 +41,7 @@ https://forum.betterbot.org/t/frost-mage-profile-by-thecrux/1014
 https://forum.betterbot.org/t/paladin-profile-by-thecrux/986
 
 ### Retribution
--
+- Missing
 
 ## Priest
 
@@ -78,7 +78,7 @@ https://forum.betterbot.org/t/warlock-profile-by-xeno/839
 https://forum.betterbot.org/t/warrior-profile-by-thecrux/982
 
 ### Arms
--
+- Missing
 
 ### Fury
--
+- Missing
