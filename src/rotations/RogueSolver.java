@@ -15,7 +15,6 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import ui.RotationUI;
 
 /**
@@ -34,7 +33,7 @@ public class RogueSolver implements RotationSolver, ICommonSettingFunctions {
   JLabel jPoisonLabel;
   JComboBox jPoisonSelect;
 
-  float mEatPercent;
+  float mEatPercentage;
   boolean mEating;
   int mPlayerLevel;
   int mActionBar;
@@ -107,11 +106,10 @@ public class RogueSolver implements RotationSolver, ICommonSettingFunctions {
     jUsePoison.setBounds(12, 110, 150, 30);
     jUsePoison.setSelected(mUI.getBoolProp("poison"));
 
-    ChangeListener poisonListener = (ChangeEvent e) -> {
+    jUsePoison.addChangeListener((ChangeEvent e) -> {
       mUI.setProp("poison", jUsePoison.isSelected());
       jPoisonSelect.setEnabled(jUsePoison.isSelected());
-    };
-    jUsePoison.addChangeListener(poisonListener);
+    });
     mUI.add(jUsePoison);
 
     jPoisonLabel = new JLabel();
@@ -134,7 +132,7 @@ public class RogueSolver implements RotationSolver, ICommonSettingFunctions {
 
     System.out.println("TheCrux's Rogue script started");
 
-    mEatPercent = mUI.getEatPercentage();
+    mEatPercentage = mUI.getEatPercentage();
     mEating = false;
   }
 
@@ -228,19 +226,19 @@ public class RogueSolver implements RotationSolver, ICommonSettingFunctions {
 
   void eat() {
 
-    if (mPlayer.getHealthFloat() < mEatPercent) {
+    if (mPlayer.getHealthFloat() < mEatPercentage) {
       if (!mEating) {
         mFoodTimer = 0;
       }
       mEating = true;
     }
-    
-    if(mPlayer.isCasting()){
+
+    if (mPlayer.isCasting()) {
       return;
     }
 
     if (mEating && !mPlayer.hasAura(mEatingBuffs) && !mPlayer.hasAura(mBuffFood)
-            && mPlayer.getHealthFloat() < mEatPercent + 0.05f) {
+            && mPlayer.getHealthFloat() < mEatPercentage + 0.05f) {
       mKeyboard.type('0'); // eat bind
       if (mFoodTimer == 0) {
         mFoodTimer = System.currentTimeMillis();
@@ -418,12 +416,12 @@ public class RogueSolver implements RotationSolver, ICommonSettingFunctions {
 
   @Override
   public boolean prepareForTravel(Vector3f arg0) {
-    if (mPlayer.isCasting()) {
+    if (mPlayer.isCasting() || mEating) {
       return true;
     }
 
     // Mount
-    if (mPlayerLevel >= 40 && !mPlayer.hasAura(mMounts)) {
+    if (mPlayerLevel >= 40 && !mPlayer.hasAura(mMounts) && mUI.shouldUseMount()) {
       switchActionBar(2);
       mKeyboard.type('0');
       switchActionBar(1);
@@ -438,6 +436,6 @@ public class RogueSolver implements RotationSolver, ICommonSettingFunctions {
 
   @Override
   public void setEatPercentage(float value) {
-    mEatPercent = value;
+    mEatPercentage = value;
   }
 }
