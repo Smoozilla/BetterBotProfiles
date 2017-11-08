@@ -106,13 +106,14 @@ public class WarriorSolver implements RotationSolver, ICommonSettingFunctions {
       switchActionBar(1);
     }
 
-    if (mPlayer.isCasting()) {
+    // Move to the target
+    if (mPlayer.inCombat() && u.getDistance() > 5) {
+      mBot.getMovement().walkTo(u.getVector(), 4);
       return;
     }
 
     int rageValue = mPlayer.getRage();
 
-    float targetDistance = u.getDistance();
     int attackerAmount = mBot.getAttackers().size();
 
     // Pummel
@@ -129,7 +130,7 @@ public class WarriorSolver implements RotationSolver, ICommonSettingFunctions {
 
     if (mPlayerLevel >= 6 && attackerAmount > 1 && !u.hasAura(mThunderClap) && !mBot.anyOnCD(mThunderClap)) {
       // Thunderclap
-      if (rageValue >= 20 && targetDistance <= 5) {
+      if (rageValue >= 20) {
         mKeyboard.type('0');
       }
       else {
@@ -163,11 +164,11 @@ public class WarriorSolver implements RotationSolver, ICommonSettingFunctions {
       mKeyboard.type('2');
     }
     // Heroic Strike
-    else if (rageValue >= 15 && targetDistance <= 5) {
+    else if (rageValue >= 15) {
       mKeyboard.type('1');
     }
     // Melee Attack
-    else if (targetDistance <= 5) {
+    else {
       mKeyboard.type('7');
     }
   }
