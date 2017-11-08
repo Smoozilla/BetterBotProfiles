@@ -69,7 +69,7 @@ https://forum.betterbot.org/t/elemental-shaman-profile-by-thecrux/1009
 
 ## Warlock
 
-You want to have a look at Xeno's profile
+You want to have a look at Xeno's profile <br>
 https://forum.betterbot.org/t/warlock-profile-by-xeno/839
 
 ## Warrior
