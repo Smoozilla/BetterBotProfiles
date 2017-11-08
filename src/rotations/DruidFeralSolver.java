@@ -162,6 +162,10 @@ public class DruidFeralSolver implements RotationSolver, ICommonSettingFunctions
       if (mPlayerLevel >= 32 && mPlayer.getEnergy() >= 60) {
         mKeyboard.type('2');
       }
+      // Claw
+      else {
+        mKeyboard.type('4');
+      }
       combat(u);
     }
   }
