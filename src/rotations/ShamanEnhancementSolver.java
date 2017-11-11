@@ -6,8 +6,10 @@ import com.betterbot.api.pub.Keyboard;
 import com.betterbot.api.pub.Unit;
 import com.betterbot.api.pub.Vector3f;
 import com.betterbot.api.pub.RotationSolver;
+import java.awt.event.ActionEvent;
 
 import java.awt.event.KeyEvent;
+import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import ui.RotationUI;
 
@@ -24,6 +26,8 @@ public class ShamanEnhancementSolver implements RotationSolver, ICommonSettingFu
   Unit mPlayer;
   RotationUI mUI;
   int mActionBar;
+  
+  JCheckBox jUseStormstrike;
 
   float mDrinkPercentage;
   boolean mDrinking;
@@ -83,10 +87,24 @@ public class ShamanEnhancementSolver implements RotationSolver, ICommonSettingFu
     mKeyboard = bot.getKeyboard();
     mPlayerLevel = mPlayer.getLevel();
     mActionBar = 1;
-
+    
+    // ====== UI Settings ======
     mUI.removeMountSettings();
     mUI.removeEatingSettings();
-
+    
+    jUseStormstrike = new JCheckBox();
+    jUseStormstrike.setText("Use Stormstrike");
+    jUseStormstrike.setBounds(12, 90, 160, 30);
+    jUseStormstrike.setSelected(mUI.getBoolProp("stormstrike"));
+    jUseStormstrike.addActionListener((ActionEvent e) -> {
+      mUI.setProp("stormstrike", jUseStormstrike.isSelected());
+    });
+    mUI.add(jUseStormstrike);
+    
+    mUI.revalidate();
+    mUI.repaint();
+    // =========================
+    
     System.out.println("TheCrux's Enhancement Shaman script started");
 
     mDrinkPercentage = mUI.getDrinkPercentage();
@@ -145,7 +163,7 @@ public class ShamanEnhancementSolver implements RotationSolver, ICommonSettingFu
 
         if (targetDistance <= 5) {
           // Stormstrike
-          if (mPlayerLevel >= 40 && targetDistance <= 5 && !mBot.anyOnCD(mStormstrike) && targetHealth > 0.1f
+          if (mPlayerLevel >= 40 && targetDistance <= 5 && !mBot.anyOnCD(mStormstrike) && jUseStormstrike.isSelected() && targetHealth > 0.1f
                   && manaValue > 0.3f) {
             mKeyboard.type('5');
           }
@@ -158,7 +176,7 @@ public class ShamanEnhancementSolver implements RotationSolver, ICommonSettingFu
         if (mPlayerLevel >= 10 && targetHealth > 0.3f && manaValue > 0.15f) {
           // Flame Shock
           if (!u.hasAura(mFlameShock) && !mBot.anyOnCD(mFlameShock) && !mBot.anyOnCD(mEarthShock)
-                  && (mPlayerLevel < 40 || (mBot.anyOnCD(mStormstrike) && !u.hasAura(mStormstrike)))) {
+                  && targetHealth > 0.2f && (!jUseStormstrike.isSelected() || mPlayerLevel < 40 || (mBot.anyOnCD(mStormstrike) && !u.hasAura(mStormstrike)))) {
             mKeyboard.type('2');
           }
           // Searing Totem
@@ -167,11 +185,11 @@ public class ShamanEnhancementSolver implements RotationSolver, ICommonSettingFu
           }
         }
         // Earth Shock
-        if (mPlayerLevel >= 4 && !mBot.anyOnCD(mEarthShock) && manaValue > 0.15f) {
+        if (mPlayerLevel >= 4 && !mBot.anyOnCD(mEarthShock) && targetHealth > 0.1f && manaValue > 0.15f) {
           if (mPlayerLevel >= 10 && mPlayerLevel < 40 && mBot.anyOnCD(mFlameShock)) {
             return;
           }
-          if (mPlayerLevel >= 40 && !u.hasAura(mStormstrike)) {
+          if (mPlayerLevel >= 40 && !u.hasAura(mStormstrike) && jUseStormstrike.isSelected()) {
             return;
           }
           mKeyboard.type('1');
@@ -323,6 +341,10 @@ public class ShamanEnhancementSolver implements RotationSolver, ICommonSettingFu
 
   @Override
   public boolean afterResurrect() {
+    if(mPlayer.inCombat()){
+      return false;
+    }
+    
     return combatEnd(null);
   }
 
