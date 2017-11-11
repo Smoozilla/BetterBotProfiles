@@ -144,12 +144,12 @@ public class DruidFeralSolver implements RotationSolver, ICommonSettingFunctions
     }
     // Player below 60% Health
     else {
-      // Remove Catform
-      if (mPlayer.hasAura(mCatForm)) {
-        mKeyboard.type('6');
-      }
-      // Healing Touch
       if (mPlayer.getManaFloat() >= 0.2f) {
+        // Remove Catform
+        if (mPlayer.hasAura(mCatForm)) {
+          mKeyboard.type('6');
+        }
+        // Healing Touch
         mKeyboard.type('3');
       }
     }
@@ -158,8 +158,13 @@ public class DruidFeralSolver implements RotationSolver, ICommonSettingFunctions
   @Override
   public void pull(Unit u) {
     if (isFullBuffed()) {
+      int energyValue = mPlayer.getEnergy();
+      // Try to use Shred
+      if(mPlayerLevel >= 22 && energyValue >= 60){
+        mKeyboard.type('1');
+      }
       // Try to use Ravage
-      if (mPlayerLevel >= 32 && mPlayer.getEnergy() >= 60) {
+      else if (mPlayerLevel >= 32 && energyValue >= 60) {
         mKeyboard.type('2');
       }
       // Claw
@@ -265,6 +270,9 @@ public class DruidFeralSolver implements RotationSolver, ICommonSettingFunctions
 
   @Override
   public boolean afterResurrect() {
+    if(mPlayer.inCombat()){
+      return false;
+    }
     return combatEnd(null);
   }
 

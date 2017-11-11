@@ -10,7 +10,8 @@
 <project name="Profiles" default="createAll" basedir=".">
     <description>Builds, tests, and runs the project Profiles.</description>
     <!--<import file="nbproject/build-impl.xml"/>-->
-
+    <!--<compilerarg value="-Xlint:unchecked"/>-->
+       
     <property name="src.dir" value="src"/>
     <property name="dist.dir" value="dist"/>
     <property name="build.dir" value="build"/>
@@ -49,9 +50,9 @@
 
     <target name="expHunter" depends="clean">
         <mkdir dir="${build.dir}"/>
-        <javac includeantruntime="false" srcdir="${src.dir}" includes="rotations/HunterSolver.java" destdir="${build.dir}" classpath="lib/libBetterBot.jar"/>
+        <javac includeantruntime="false" srcdir="${src.dir}" includes="rotations/HunterSolver.java,ui.RotaionUI.java" destdir="${build.dir}" classpath="lib/libBetterBot.jar"/>
         <mkdir dir="${dist.dir}"/>
-        <jar basedir="${build.dir}" destfile="${dist.dir}/HunterSolver.jar" includes="rotations/HunterSolver.class"/>
+        <jar basedir="${build.dir}" destfile="${dist.dir}/HunterSolver.jar" includes="rotations/**/*.class,ui/**/*.class"/>
     </target>
 	
     <target name="expHunterBeast" depends="clean">

@@ -11,80 +11,103 @@ import com.betterbot.api.pub.Movement;
 import com.betterbot.api.pub.Unit;
 import com.betterbot.api.pub.Vector3f;
 import com.betterbot.api.pub.RotationSolver;
+import javax.swing.ButtonGroup;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JRadioButton;
+import javax.swing.JTextField;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import ui.RotationUI;
 
 /**
  *
  * @author TheCrux
  */
-
-public class HunterSolver implements RotationSolver {
+public class HunterSolver implements RotationSolver, ICommonSettingFunctions {
 
   BetterBot mBot;
+  RotationUI mUI;
   Keyboard mKeyboard;
   Movement mMovement;
   Unit mPlayer;
   Unit mPet;
   int mActionBar;
 
-  float mDrinkPercent;
-  float mEatPercent;
+  JLabel jAmmoAmountLabel;
+  JTextField jAmmoAmount;
+  JLabel jAmmoLabel;
+  JComboBox<String> jAmmoName;
+  JRadioButton jBow;
+  JRadioButton jGun;
+  JCheckBox jUseSerpentSting;
+
+  float mDrinkPercentage;
+  float mEatPercentage;
   boolean mDrinking;
   boolean mEating;
   int mPlayerLevel;
-  boolean mUsingBow;
 
   // Everything sorted by rank!
   // Spells
-  int mRaptorStrike[] = { 2973, 14260, 14261, 14262, 14263, 14264, 14265, 14266 };
-  int mArcaneShot[] = { 3044, 14281, 14282, 14283, 14284, 14285, 14286, 14287 };
+  int mRaptorStrike[] = {2973, 14260, 14261, 14262, 14263, 14264, 14265, 14266};
+  int mArcaneShot[] = {3044, 14281, 14282, 14283, 14284, 14285, 14286, 14287};
   int mConcussiveShot = 5116;
-  int mMongooseBite[] = { 1495, 14269, 14270, 14271 };
-  int mDisengage[] = { 781, 14272, 14273 };
+  int mMongooseBite[] = {1495, 14269, 14270, 14271};
+  int mDisengage[] = {781, 14272, 14273};
   int mRapidFire = 3045;
   int mFeignDeath = 5384;
 
   // Buffs
   int mAspectOfTheMonkey = 13163;
-  int mAspectOfTheHawk[] = { 13165, 14318, 14319, 14320, 14321, 14322, 25296 };
+  int mAspectOfTheHawk[] = {13165, 14318, 14319, 14320, 14321, 14322, 25296};
   int mAspectOfTheCheetah = 5118;
 
   // Debuffs
-  int mSerpentString[] = { 1978, 13549, 13550, 13551, 13552, 13553, 13554, 13555, 25295 };
-  int mHuntersMark[] = { 1130, 14323, 14324, 14325 };
+  int mSerpentString[] = {1978, 13549, 13550, 13551, 13552, 13553, 13554, 13555, 25295};
+  int mHuntersMark[] = {1130, 14323, 14324, 14325};
 
   // Drinking Buffs
-  int mDrinkingBuffs[] = { 430, 431, 432, 1133, 1135, 1137, 10250, 22734, 24355, 29007 };
+  int mDrinkingBuffs[] = {430, 431, 432, 1133, 1135, 1137, 10250, 22734, 24355, 29007};
 
   // Eating Buffs
-  int mEatingBuffs[] = { 433, 434, 435, 1127, 1129, 1131, 2639, 6410, 7737, 24005, 25700, 25886, 28616, 29008, 29073 };
+  int mEatingBuffs[] = {433, 434, 435, 1127, 1129, 1131, 2639, 6410, 7737, 24005, 25700, 25886, 28616, 29008, 29073};
+  int mBuffFood[] = {5004, 5005, 5006, 5007, 10256, 10257, 18229, 18230, 18231, 24800, 24869, 25660};
+
+  // Ammo
+  String mArrows[] = {"Rough Arrow", "Sharp Arrow", "Razor Arrow", "Jagged Arrow"};
+  String mBullets[] = {"Light Shot", "Heavy Shot", "Solid Shot", "Accurate Slugs"};
 
   // Mounts
   int mMounts[] = {
-      // Wolfs
-      1132, 6653, 6654, 23251, 23252, 23250,
-      // Raptors
-      10799, 10796, 8395, 23243, 23242, 23241,
-      // Kodos
-      18989, 18990, 23247, 23248, 23249,
-      // Undead Horses
-      17462, 17464, 17463, 17465, 23246,
-      // Horses
-      472, 6648, 458, 470, 23228, 23227, 23229,
-      // Saber
-      10789, 8394, 10793, 23221, 23219, 23338,
-      // Rams
-      6898, 6777, 6899, 23240, 23239, 23238,
-      // Mechanostrider
-      17454, 10873, 17453, 10969, 23222, 23223, 23225,
-      // PvP - Horde
-      22721, 22722, 22724, 22718, 23509,
-      // PvP - Alliance
-      22717, 22723, 22720, 22719, 23510,
-      // Special (mostly Dungeons)
-      24252, 17450, 24242, 16084, 18991, 18992, 17229 };
+    // Wolfs
+    1132, 6653, 6654, 23251, 23252, 23250,
+    // Raptors
+    10799, 10796, 8395, 23243, 23242, 23241,
+    // Kodos
+    18989, 18990, 23247, 23248, 23249,
+    // Undead Horses
+    17462, 17464, 17463, 17465, 23246,
+    // Horses
+    472, 6648, 458, 470, 23228, 23227, 23229,
+    // Saber
+    10789, 8394, 10793, 23221, 23219, 23338,
+    // Rams
+    6898, 6777, 6899, 23240, 23239, 23238,
+    // Mechanostrider
+    17454, 10873, 17453, 10969, 23222, 23223, 23225,
+    // PvP - Horde
+    22721, 22722, 22724, 22718, 23509,
+    // PvP - Alliance
+    22717, 22723, 22720, 22719, 23510,
+    // Special (mostly Dungeons)
+    24252, 17450, 24242, 16084, 18991, 18992, 17229};
 
   public HunterSolver(BetterBot bot) {
     mBot = bot;
+    mUI = new RotationUI(this);
     mKeyboard = bot.getKeyboard();
     mMovement = bot.getMovement();
     mPlayer = bot.getPlayer();
@@ -92,27 +115,126 @@ public class HunterSolver implements RotationSolver {
     mPlayerLevel = mPlayer.getLevel();
     mActionBar = 1;
 
+    // ====== UI Settings ======
+    // Maybe not necessary
+    // Using Bow or Gun
+    jBow = new JRadioButton();
+    jBow.setText("(Cross-)Bow");
+    jBow.setBounds(12, 165, 120, 30);
+    jBow.addChangeListener((ChangeEvent e) -> {
+      mUI.setProp("bow", jBow.isSelected());
+      //jAmmoName.setModel(new DefaultComboBoxModel<>(mArrows));
+    });
+
+    jGun = new JRadioButton();
+    jGun.setText("Gun");
+    jGun.setBounds(12, 190, 120, 30);
+    jGun.addChangeListener((ChangeEvent e) -> {
+      mUI.setProp("gun", jGun.isSelected());
+      //jAmmoName.setModel(new DefaultComboBoxModel<>(mBullets));
+    });
+
+    boolean useBow = mUI.getBoolProp("bow");
+    boolean useGun = mUI.getBoolProp("gun");
+
+    // First use nothing is selected            
+    if (useBow == false && useGun == false) {
+      if (mBot.getInventory().getItemCount(11285, 3030, 2515, 2512) > 0) {
+        System.out.println("Using Bow");
+        jBow.setSelected(true);
+      }
+      else/* if (mBot.getInventory().getItemCount(11284, 3033, 2519, 2516) > 0)*/ {
+        System.out.println("Using Gun");
+        jGun.setSelected(true);
+      }
+    }
+    else {
+      jBow.setSelected(useBow);
+      jGun.setSelected(useGun);
+    }
+
+    mUI.add(jBow);
+    mUI.add(jGun);
+
+    ButtonGroup weaponUsage = new ButtonGroup();
+    weaponUsage.add(jBow);
+    weaponUsage.add(jGun);
+    /*
+    jAmmoLabel = new JLabel();
+    jAmmoLabel.setText("Ammo Name");
+    jAmmoLabel.setBounds(12, 215, 120, 30);
+    mUI.add(jAmmoLabel);
+
+    if (jBow.isSelected()) {
+      jAmmoName = new JComboBox<>(mArrows);
+    }
+    else {
+      jAmmoName = new JComboBox<>(mBullets);
+    }
+    jAmmoName.setBounds(12, 240, 120, 30);
+    jAmmoName.setSelectedIndex(mUI.getIndexProp("ammo"));
+    jAmmoName.addActionListener((ActionEvent e) -> {
+      mUI.setProp("ammo", jAmmoName.getSelectedIndex());
+    });
+    mUI.add(jAmmoName);
+     */
+    jAmmoAmountLabel = new JLabel();
+    jAmmoAmountLabel.setText("Ammo amount");
+    jAmmoAmountLabel.setBounds(12, 265, 160, 30);
+    mUI.add(jAmmoAmountLabel);
+
+    jAmmoAmount = new JTextField();
+    String ammoAmount = mUI.getStringProp("ammoAmount");
+    if (ammoAmount.isEmpty()) {
+      ammoAmount = "6";
+    }
+    jAmmoAmount.setText(ammoAmount);
+    jAmmoAmount.setBounds(12, 290, 120, 30);
+    jAmmoAmount.getDocument().addDocumentListener(new DocumentListener() {
+      @Override
+      public void insertUpdate(DocumentEvent e) {
+        mUI.setProp("ammoAmount", jAmmoAmount.getText());
+      }
+
+      @Override
+      public void removeUpdate(DocumentEvent e) {
+        mUI.setProp("ammoAmount", jAmmoAmount.getText());
+      }
+
+      @Override
+      public void changedUpdate(DocumentEvent e) {
+        mUI.setProp("ammoAmount", jAmmoAmount.getText());
+      }
+
+    });
+    mUI.add(jAmmoAmount);
+
+    jUseSerpentSting = new JCheckBox();
+    jUseSerpentSting.setText("Use Serpent Sting");
+    jUseSerpentSting.setBounds(12, 315, 160, 30);
+    jUseSerpentSting.setSelected(mUI.getBoolProp("useSerpentSting"));
+    jUseSerpentSting.addChangeListener((ChangeEvent e) -> {
+      mUI.setProp("useSerpentSting", jUseSerpentSting.isSelected());
+    });
+    mUI.add(jUseSerpentSting);
+
+    mUI.revalidate();
+    mUI.repaint();
+    // =========================
+
     System.out.println("TheCrux's Hunter script started");
 
-    mDrinkPercent = 0.35f; // drink if below 35% mana
-    mEatPercent = 0.6f; // eat if below 60% health
+    mDrinkPercentage = mUI.getDrinkPercentage();
+    mEatPercentage = mUI.getEatPercentage();
     mDrinking = false;
-
-    if (mBot.getInventory().getItemCount(11285, 3030, 2515, 2512) > 0) {
-      mUsingBow = true;
-    } else if (mBot.getInventory().getItemCount(11284, 3033, 2519, 2516) > 0) {
-      mUsingBow = false;
-    } else {
-      System.out.println("Can't tell if gun or bow is equipped");
-      System.exit(1);
-    }
+    mEating = false;
   }
 
   void switchActionBar(int bar) {
     if (mActionBar != bar) {
       mKeyboard.press(KeyEvent.VK_SHIFT);
       mKeyboard.type("" + bar);
-      mBot.sleep(100, 300);
+      mBot.sleep(300, 500);
       mKeyboard.release(KeyEvent.VK_SHIFT);
       mActionBar = bar;
     }
@@ -135,10 +257,7 @@ public class HunterSolver implements RotationSolver {
       if (attackers.size() > 1) {
         for (Unit a : attackers) {
           if (a.getTarget() == mPlayer.getGUID()) {
-            a.target();
-            mKeyboard.press(KeyEvent.VK_CONTROL);
-            mKeyboard.type('1');
-            mKeyboard.release(KeyEvent.VK_CONTROL);
+            petAttack(a);
             break;
           }
         }
@@ -162,20 +281,31 @@ public class HunterSolver implements RotationSolver {
 
     // Mend Pet
     if (mPet != null && !mPet.isDead() && mPet.getHealthFloat() <= 0.4f && mPlayer.getHealthFloat() >= 0.5f) {
+      // Walk in range
+      if (mPet.getDistance() > 20 && !mMovement.isMoving()) {
+        mMovement.walkTo(mPet.getVector(), 18);
+        return;
+      }
       switchActionBar(2);
       mKeyboard.type('4');
       switchActionBar(1);
+      return;
+    }
+
+    // Feign Death
+    if (mPlayerLevel >= 30 && u.getTarget() == mPlayer.getGUID() && mPet != null && !mPet.isDead()
+            && !mBot.anyOnCD(mFeignDeath) && targetHealth < 0.85f) {
+      mKeyboard.type('6');
     }
 
     // Range Attacks
     if (targetDistance > 9) {
-
       // Hunter's Mark
       if (mPlayerLevel >= 6 && !u.hasAura(mHuntersMark) && targetHealth >= 0.2f && manaValue >= 0.1f) {
         mKeyboard.type('8');
       }
       // Serpent Sting
-      else if (mPlayerLevel >= 4 && !u.hasAura(mSerpentString) && targetHealth >= 0.15f && manaValue >= 0.15f) {
+      else if (mPlayerLevel >= 4 && !u.hasAura(mSerpentString) && jUseSerpentSting.isSelected() && targetHealth >= 0.15f && manaValue >= 0.15f) {
         mKeyboard.type('3');
       }
       // Arcane Shot
@@ -189,24 +319,19 @@ public class HunterSolver implements RotationSolver {
     }
     // Melee Attacks
     else {
-      // Mongoose Bite
-      //if(mPlayerLevel >= 16 && !mBot.anyOnCD(mMongooseBite)) {
-      //  mKeyboard.type('5');
-      //}
+      // Try to use Mongoose Bite
+      if (mPlayerLevel >= 16 && !mBot.anyOnCD(mMongooseBite)) {
+        mKeyboard.type('5');
+      }
       // Aspect of the Monkey with dead pet
       if (mPet != null && mPet.isDead() && !mPlayer.hasAura(mAspectOfTheMonkey)) {
         switchActionBar(2);
         mKeyboard.type('8');
         switchActionBar(1);
       }
-      // Feign Death
-      else if (mPlayerLevel >= 30 && u.getTarget() == mPlayer.getGUID() && mPet != null && !mPet.isDead()
-          && !mBot.anyOnCD(mFeignDeath)) {
-        mKeyboard.type('6');
-      }
       // Disengage
       else if (mPlayerLevel >= 20 && u.getTarget() == mPlayer.getGUID() && mPet != null && !mPet.isDead()
-          && !mBot.anyOnCD(mDisengage)) {
+              && !mBot.anyOnCD(mDisengage)) {
         mKeyboard.type('-');
       }
       // Raptor Strike
@@ -220,29 +345,36 @@ public class HunterSolver implements RotationSolver {
     }
   }
 
+  void petAttack(Unit mob) {
+    mob.target();
+    mKeyboard.press(KeyEvent.VK_CONTROL);
+    mKeyboard.type('1');
+    mKeyboard.release(KeyEvent.VK_CONTROL);
+  }
+
   @Override
   public void pull(Unit u) {
-    if (isPetAliveAndWell())
+    if (isPetAliveAndWell()) {
       combat(u);
+    }
   }
 
   @Override
   public boolean combatEnd(Unit u) {
 
     drinkAndEat();
-    if (mDrinking || mEating)
+    if (mDrinking || mEating) {
       return true;
+    }
 
-    if (!isFullBuffed())
-      return true;
-
-    return false;
+    return !isFullBuffed();
   }
 
   boolean isPetAliveAndWell() {
 
-    if (mPlayer.isCasting())
+    if (mPlayer.isCasting()) {
       return false;
+    }
 
     if (mPlayerLevel >= 10) {
       mPet = mPlayer.getPet(); // Make sure the pet is null again after the player died
@@ -288,37 +420,49 @@ public class HunterSolver implements RotationSolver {
     return true;
   }
 
+  long mFoodTimer;
+
   void drinkAndEat() {
     switchActionBar(1);
 
-    if (mPlayer.getManaFloat() < mDrinkPercent)
+    if (mPlayer.getManaFloat() < mDrinkPercentage) {
       mDrinking = true;
+    }
 
-    if (mPlayer.getHealthFloat() < mEatPercent)
+    if (mPlayer.getHealthFloat() < mEatPercentage) {
+      if (!mEating) {
+        mFoodTimer = 0;
+      }
       mEating = true;
+    }
 
     // Drink
-    if (mDrinking && !mPlayer.hasAura(mDrinkingBuffs) && mPlayer.getManaFloat() < mDrinkPercent + 0.05f) {
+    if (mDrinking && !mPlayer.hasAura(mDrinkingBuffs) && mPlayer.getManaFloat() < mDrinkPercentage + 0.05f) {
       mKeyboard.type('0');
       mBot.sleep(1200, 1700); // prevent double drinking
     }
 
     // Eat
-    if (mEating && !mPlayer.hasAura(mEatingBuffs) && mPlayer.getHealthFloat() < mEatPercent + 0.05f) {
+    if (mEating && !mPlayer.hasAura(mEatingBuffs) && !mPlayer.hasAura(mEatingBuffs) && mPlayer.getHealthFloat() < mEatPercentage + 0.05f) {
       mKeyboard.type('9');
+      if (mFoodTimer == 0) {
+        mFoodTimer = System.currentTimeMillis();
+      }
       mBot.sleep(1200, 1700); // prevent double eating
     }
 
     if (mDrinking && mPlayer.getManaFloat() > 0.9f) {
       mDrinking = false; // over 90% mana, good enough
-      if (!mEating)
+      if (!mEating) {
         mKeyboard.type('w'); // force to be standing
+      }
     }
 
     if (mEating && mPlayer.getHealthFloat() > 0.9f) {
-      mEating = false; // over 90% health, good enough
-      if (!mDrinking)
+      if (!mDrinking && !mPlayer.hasAura(mBuffFood) || ((System.currentTimeMillis() - mFoodTimer) > 10500)) {
+        mEating = false; // over 90% health, good enough
         mKeyboard.type('w'); // force to be standing
+      }
     }
   }
 
@@ -344,20 +488,20 @@ public class HunterSolver implements RotationSolver {
         switchActionBar(1);
       }
 
-      // Check for buffs
-      if (!isFullBuffed()) {
-        return;
-      } else if (mPet != null && !mPet.isDead()) { // Only attack while walking if the pet is alive
+      // Check for buffs & anly attack while walking if the pet is alive
+      if (isFullBuffed() && mPet != null && !mPet.isDead()) {
         // Hunter's Mark
         if (mPlayerLevel >= 6 && !u.hasAura(mHuntersMark) && u.getDistance() < 40) {
           mKeyboard.type('8');
-          return;
+        }
+        // Pet Attack
+        else if (mPlayerLevel >= 10 && u.getDistance() < 40) {
+          petAttack(u);
         }
         // Concussive Shot
         else if (mPlayerLevel >= 8 && !u.hasAura(mConcussiveShot) && !mBot.anyOnCD(mConcussiveShot)
-            && u.getDistance() < 35) {
+                && u.getDistance() < 35) {
           mKeyboard.type('1');
-          return;
         }
       }
     }
@@ -365,60 +509,70 @@ public class HunterSolver implements RotationSolver {
 
   @Override
   public boolean afterResurrect() {
-
-    drinkAndEat();
-    if (mDrinking || mEating) {
-      return true;
+    if (mPlayer.inCombat()) {
+      return false;
     }
-
-    if (!isPetAliveAndWell()) {
-      return true;
-    }
-
-    if (!isFullBuffed()) {
-      return true;
-    }
-
-    return false;
+    return combatEnd(null);
   }
 
   @Override
   public boolean atVendor(Vendor vend) {
-    int stackAmount = 5;
+    int stackAmount = Integer.parseInt(jAmmoAmount.getText());
+    boolean useBow = jBow.isSelected();
+
+    System.out.println("At vendor!");
+
+    // Check inventory
+    if (useBow) {
+      int ammoInInv = mBot.getInventory().getItemCount(mArrows);
+      if (ammoInInv >= stackAmount) {
+        System.out.println("We've got enough arrows -> go back fighting");
+        return false;
+      }
+    }
+    else {
+      int ammoInInv = mBot.getInventory().getItemCount(mBullets);
+      if (ammoInInv >= stackAmount) {
+        System.out.println("We've got enough bullets -> go back fighting");
+        return false;
+      }
+    }
+
+    System.out.println("Going to buy " + stackAmount + " stacks of ammo!");
 
     if (mPlayerLevel >= 40) {
-      stackAmount = 13;
       // Jagged Arrow or Accurate Slugs
-      if (mUsingBow) {
+      if (useBow) {
         mBot.buyItem("Jagged Arrow", stackAmount);
-      } else {
+      }
+      else {
         mBot.buyItem("Accurate Slugs", stackAmount);
       }
-    } else if (mPlayerLevel >= 25) {
-      stackAmount = 9;
-      if (mPlayerLevel >= 30) {
-        stackAmount = 13;
-      }
-
+    }
+    else if (mPlayerLevel >= 25) {
       // Razor Arrow and Solid Shot
-      if (mUsingBow) {
+      if (useBow) {
         mBot.buyItem("Razor Arrow", stackAmount);
-      } else {
+      }
+      else {
         mBot.buyItem("Solid Shot", stackAmount);
       }
-    } else if (mPlayerLevel >= 10) {
-      stackAmount = 9;
+    }
+    else if (mPlayerLevel >= 10) {
       // Sharp Arrow and Heavy Shot
-      if (mUsingBow) {
+      if (useBow) {
         mBot.buyItem("Sharp Arrow", stackAmount);
-      } else {
+      }
+      else {
         mBot.buyItem("Heavy Shot", stackAmount);
       }
-    } else {
+    }
+    else {
       // Rough Arrow and Light Shot
-      if (mUsingBow) {
+      if (useBow) {
         mBot.buyItem("Rough Arrow", stackAmount);
-      } else {
+      }
+      else {
         mBot.buyItem("Light Shot", stackAmount);
       }
     }
@@ -440,7 +594,7 @@ public class HunterSolver implements RotationSolver {
 
   @Override
   public JComponent getUI() {
-    return null;
+    return mUI;
   }
 
   @Override
@@ -490,5 +644,15 @@ public class HunterSolver implements RotationSolver {
       return true;
     }
     return false;
+  }
+
+  @Override
+  public void setDrinkPercentage(float value) {
+    mDrinkPercentage = value;
+  }
+
+  @Override
+  public void setEatPercentage(float value) {
+    mEatPercentage = value;
   }
 }
