@@ -57,9 +57,9 @@
 	
     <target name="expHunterBeast" depends="clean">
         <mkdir dir="${build.dir}"/>
-        <javac includeantruntime="false" srcdir="${src.dir}" includes="rotations/HunterBeastSolver.java" destdir="${build.dir}" classpath="lib/libBetterBot.jar"/>
+        <javac includeantruntime="false" srcdir="${src.dir}" includes="rotations/HunterBeastSolver.java,ui/RotationUI.java" destdir="${build.dir}" classpath="lib/libBetterBot.jar"/>
         <mkdir dir="${dist.dir}"/>
-        <jar basedir="${build.dir}" destfile="${dist.dir}/HunterBeastSolver.jar" includes="rotations/HunterBeastSolver.class"/>
+        <jar basedir="${build.dir}" destfile="${dist.dir}/HunterBeastSolver.jar" includes="rotations/**/*.class,ui/**/*.class"/>
     </target>	
 	
     <target name="expMageFrost" depends="clean">

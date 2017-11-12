@@ -1,17 +1,18 @@
 package rotations;
 
-import java.awt.event.KeyEvent;
-import java.util.List;
-import javax.swing.JComponent;
 import com.betterbot.api.pub.BetterBot;
 import com.betterbot.api.pub.Database.Vendor;
-import com.betterbot.api.pub.Inventory;
 import com.betterbot.api.pub.Keyboard;
 import com.betterbot.api.pub.Movement;
 import com.betterbot.api.pub.Unit;
 import com.betterbot.api.pub.Vector3f;
 import com.betterbot.api.pub.RotationSolver;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.util.List;
+import javax.swing.JComponent;
 import javax.swing.ButtonGroup;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -36,6 +37,8 @@ public class HunterSolver implements RotationSolver, ICommonSettingFunctions {
   Unit mPet;
   int mActionBar;
 
+  JLabel jVendor;
+  JCheckBox jBuyAmmo;
   JLabel jAmmoAmountLabel;
   JTextField jAmmoAmount;
   JLabel jAmmoLabel;
@@ -116,22 +119,50 @@ public class HunterSolver implements RotationSolver, ICommonSettingFunctions {
     mActionBar = 1;
 
     // ====== UI Settings ======
+    jVendor = new JLabel();
+    jVendor.setText("Vendor settings");
+    jVendor.setBounds(250, 30, 120, 30);
+    mUI.add(jVendor);
+
+    // Should vendor
+    jBuyAmmo = new JCheckBox();
+    jBuyAmmo.setText("Buy ammo");
+    jBuyAmmo.setBounds(250, 55, 120, 30);
+    jBuyAmmo.setSelected(mUI.getBoolProp("buyAmmo"));
+    jBuyAmmo.addActionListener((ActionEvent e) -> {
+      boolean buyAmmo = jBuyAmmo.isSelected();
+      mUI.setProp("buyAmmo", buyAmmo);
+      jBow.setEnabled(buyAmmo);
+      jGun.setEnabled(buyAmmo);
+      jAmmoName.setEnabled(buyAmmo);
+      jAmmoAmount.setEnabled(buyAmmo);
+    });
+    mUI.add(jBuyAmmo);
+
     // Maybe not necessary
     // Using Bow or Gun
     jBow = new JRadioButton();
     jBow.setText("(Cross-)Bow");
-    jBow.setBounds(12, 165, 120, 30);
+    jBow.setBounds(250, 85, 120, 30);
+    jBow.setEnabled(jBuyAmmo.isSelected());
     jBow.addChangeListener((ChangeEvent e) -> {
-      mUI.setProp("bow", jBow.isSelected());
-      //jAmmoName.setModel(new DefaultComboBoxModel<>(mArrows));
+      boolean useBow = jBow.isSelected();
+      mUI.setProp("bow", useBow);
+      if (jAmmoName != null && useBow) {
+        jAmmoName.setModel(new DefaultComboBoxModel<>(mArrows));
+      }
     });
 
     jGun = new JRadioButton();
     jGun.setText("Gun");
-    jGun.setBounds(12, 190, 120, 30);
+    jGun.setBounds(250, 110, 120, 30);
+    jGun.setEnabled(jBuyAmmo.isSelected());
     jGun.addChangeListener((ChangeEvent e) -> {
-      mUI.setProp("gun", jGun.isSelected());
-      //jAmmoName.setModel(new DefaultComboBoxModel<>(mBullets));
+      boolean useGun = jGun.isSelected();
+      mUI.setProp("gun", useGun);
+      if (jAmmoName != null && useGun) {
+        jAmmoName.setModel(new DefaultComboBoxModel<>(mBullets));
+      }
     });
 
     boolean useBow = mUI.getBoolProp("bow");
@@ -159,10 +190,11 @@ public class HunterSolver implements RotationSolver, ICommonSettingFunctions {
     ButtonGroup weaponUsage = new ButtonGroup();
     weaponUsage.add(jBow);
     weaponUsage.add(jGun);
-    /*
+
+    // Select ammo
     jAmmoLabel = new JLabel();
     jAmmoLabel.setText("Ammo Name");
-    jAmmoLabel.setBounds(12, 215, 120, 30);
+    jAmmoLabel.setBounds(250, 140, 120, 30);
     mUI.add(jAmmoLabel);
 
     if (jBow.isSelected()) {
@@ -171,16 +203,18 @@ public class HunterSolver implements RotationSolver, ICommonSettingFunctions {
     else {
       jAmmoName = new JComboBox<>(mBullets);
     }
-    jAmmoName.setBounds(12, 240, 120, 30);
+    jAmmoName.setBounds(250, 165, 120, 30);
+    jAmmoName.setEnabled(jBuyAmmo.isSelected());
     jAmmoName.setSelectedIndex(mUI.getIndexProp("ammo"));
     jAmmoName.addActionListener((ActionEvent e) -> {
       mUI.setProp("ammo", jAmmoName.getSelectedIndex());
     });
     mUI.add(jAmmoName);
-     */
+
+    // Ammo amount
     jAmmoAmountLabel = new JLabel();
     jAmmoAmountLabel.setText("Ammo amount");
-    jAmmoAmountLabel.setBounds(12, 265, 160, 30);
+    jAmmoAmountLabel.setBounds(250, 190, 160, 30);
     mUI.add(jAmmoAmountLabel);
 
     jAmmoAmount = new JTextField();
@@ -189,7 +223,8 @@ public class HunterSolver implements RotationSolver, ICommonSettingFunctions {
       ammoAmount = "6";
     }
     jAmmoAmount.setText(ammoAmount);
-    jAmmoAmount.setBounds(12, 290, 120, 30);
+    jAmmoAmount.setBounds(250, 215, 120, 30);
+    jAmmoAmount.setEnabled(jBuyAmmo.isSelected());
     jAmmoAmount.getDocument().addDocumentListener(new DocumentListener() {
       @Override
       public void insertUpdate(DocumentEvent e) {
@@ -209,9 +244,10 @@ public class HunterSolver implements RotationSolver, ICommonSettingFunctions {
     });
     mUI.add(jAmmoAmount);
 
+    // Serpent Sting
     jUseSerpentSting = new JCheckBox();
     jUseSerpentSting.setText("Use Serpent Sting");
-    jUseSerpentSting.setBounds(12, 315, 160, 30);
+    jUseSerpentSting.setBounds(12, 165, 160, 30);
     jUseSerpentSting.setSelected(mUI.getBoolProp("useSerpentSting"));
     jUseSerpentSting.addChangeListener((ChangeEvent e) -> {
       mUI.setProp("useSerpentSting", jUseSerpentSting.isSelected());
@@ -518,28 +554,22 @@ public class HunterSolver implements RotationSolver, ICommonSettingFunctions {
   @Override
   public boolean atVendor(Vendor vend) {
     int stackAmount = Integer.parseInt(jAmmoAmount.getText());
-    boolean useBow = jBow.isSelected();
 
     System.out.println("At vendor!");
 
+    String ammoName = (String) jAmmoName.getSelectedItem();
+
     // Check inventory
-    if (useBow) {
-      int ammoInInv = mBot.getInventory().getItemCount(mArrows);
-      if (ammoInInv >= stackAmount) {
-        System.out.println("We've got enough arrows -> go back fighting");
-        return false;
-      }
-    }
-    else {
-      int ammoInInv = mBot.getInventory().getItemCount(mBullets);
-      if (ammoInInv >= stackAmount) {
-        System.out.println("We've got enough bullets -> go back fighting");
-        return false;
-      }
+    if (mBot.getInventory().getItemCount(ammoName) >= stackAmount) {
+      System.out.println("We've got enough ammo -> go back fighting");
+      return false;
     }
 
-    System.out.println("Going to buy " + stackAmount + " stacks of ammo!");
+    System.out.println("Going to buy " + stackAmount + " stacks of " + ammoName + "!");
 
+    mBot.buyItem(ammoName, stackAmount);
+
+    /*
     if (mPlayerLevel >= 40) {
       // Jagged Arrow or Accurate Slugs
       if (useBow) {
@@ -575,8 +605,7 @@ public class HunterSolver implements RotationSolver, ICommonSettingFunctions {
       else {
         mBot.buyItem("Light Shot", stackAmount);
       }
-    }
-
+    }*/
     return false;
   }
 
@@ -600,33 +629,12 @@ public class HunterSolver implements RotationSolver, ICommonSettingFunctions {
   @Override
   public Vendor getVendor() {
 
-    if (getAmmoAmount() < 200) {
+    // Going to vendor if ammo is below 200
+    if (jBuyAmmo.isSelected() && mBot.getInventory().getItemCount((String) jAmmoName.getSelectedItem()) < 200) {
       return mBot.getDatabase().getNearestAmmo();
     }
 
     return null;
-  }
-
-  int getAmmoAmount() {
-
-    Inventory inv = mBot.getInventory();
-
-    // Jagged Arrow and Accurate Slugs
-    if (mPlayerLevel >= 40) {
-      return inv.getItemCount(11285, 11284);
-    }
-    // Razor Arrow and Solid Shot
-    else if (mPlayerLevel >= 25) {
-      return inv.getItemCount(3030, 3033);
-    }
-    // Sharp Arrow and Heavy Shot
-    else if (mPlayerLevel >= 10) {
-      return inv.getItemCount(2515, 2519);
-    }
-    // Rough Arrow and Light Shot
-    else {
-      return inv.getItemCount(2512, 2516);
-    }
   }
 
   @Override
