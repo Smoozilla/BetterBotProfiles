@@ -136,7 +136,6 @@ public class DruidSolver implements RotationSolver, ICommonSettingFunctions {
 
   @Override
   public boolean combatEnd(Unit u) {
-
     drink();
     return mDrinking;
   }
@@ -200,6 +199,9 @@ public class DruidSolver implements RotationSolver, ICommonSettingFunctions {
 
   @Override
   public boolean afterResurrect() {
+    if (mPlayer.inCombat()) {
+      return false;
+    }
     return combatEnd(null);
   }
 

@@ -359,9 +359,9 @@ public class RotationUI extends javax.swing.JPanel {
         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
           .addComponent(jDrinkPercentage, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
           .addComponent(jDrinkOkay))
-        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
         .addComponent(jUseMount)
-        .addContainerGap(138, Short.MAX_VALUE))
+        .addContainerGap(144, Short.MAX_VALUE))
     );
   }// </editor-fold>//GEN-END:initComponents
 

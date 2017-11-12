@@ -69,11 +69,11 @@
         <jar basedir="${build.dir}" destfile="${dist.dir}/MageFrostSolver.jar" includes="rotations/**/*.class,ui/**/*.class"/>
     </target>
 	
-    <target name="expPaladin">
+    <target name="expPaladin" depends="clean">
         <mkdir dir="${build.dir}"/>
-        <javac includeantruntime="false" srcdir="${src.dir}" includes="rotations/PaladinSolver.java" destdir="${build.dir}" classpath="lib/libBetterBot.jar"/>
+        <javac includeantruntime="false" srcdir="${src.dir}" includes="rotations/PaladinSolver.java,ui/RotationUI.java" destdir="${build.dir}" classpath="lib/libBetterBot.jar"/>
         <mkdir dir="${dist.dir}"/>
-        <jar basedir="${build.dir}" destfile="${dist.dir}/PaladinSolver.jar" includes="rotations/PaladinSolver.class"/>
+        <jar basedir="${build.dir}" destfile="${dist.dir}/PaladinSolver.jar" includes="rotations/**/*.class,ui/**/*.class"/>
     </target>
 	
     <target name="expPriest" depends="clean">

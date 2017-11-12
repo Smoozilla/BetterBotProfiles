@@ -14,9 +14,6 @@ import javax.swing.JComponent;
 import ui.RotationUI;
 
 /**
- * This rotation is for the Enhancement spec. You have to skill Stormstrike on
- * level 40!
- *
  * @author TheCrux
  */
 public class ShamanEnhancementSolver implements RotationSolver, ICommonSettingFunctions {
@@ -26,7 +23,7 @@ public class ShamanEnhancementSolver implements RotationSolver, ICommonSettingFu
   Unit mPlayer;
   RotationUI mUI;
   int mActionBar;
-  
+
   JCheckBox jUseStormstrike;
 
   float mDrinkPercentage;
@@ -87,11 +84,11 @@ public class ShamanEnhancementSolver implements RotationSolver, ICommonSettingFu
     mKeyboard = bot.getKeyboard();
     mPlayerLevel = mPlayer.getLevel();
     mActionBar = 1;
-    
+
     // ====== UI Settings ======
     mUI.removeMountSettings();
     mUI.removeEatingSettings();
-    
+
     jUseStormstrike = new JCheckBox();
     jUseStormstrike.setText("Use Stormstrike");
     jUseStormstrike.setBounds(12, 90, 160, 30);
@@ -100,11 +97,11 @@ public class ShamanEnhancementSolver implements RotationSolver, ICommonSettingFu
       mUI.setProp("stormstrike", jUseStormstrike.isSelected());
     });
     mUI.add(jUseStormstrike);
-    
+
     mUI.revalidate();
     mUI.repaint();
     // =========================
-    
+
     System.out.println("TheCrux's Enhancement Shaman script started");
 
     mDrinkPercentage = mUI.getDrinkPercentage();
@@ -341,10 +338,10 @@ public class ShamanEnhancementSolver implements RotationSolver, ICommonSettingFu
 
   @Override
   public boolean afterResurrect() {
-    if(mPlayer.inCombat()){
+    if (mPlayer.inCombat()) {
       return false;
     }
-    
+
     return combatEnd(null);
   }
 

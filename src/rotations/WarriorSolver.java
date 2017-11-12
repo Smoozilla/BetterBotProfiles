@@ -140,7 +140,7 @@ public class WarriorSolver implements RotationSolver, ICommonSettingFunctions {
 
     // Blood Rage
     if (mPlayerLevel >= 10 && mPlayer.inCombat() && !mBot.anyOnCD(mBloodrage)) {
-      mKeyboard.type('-');
+      mKeyboard.type('9');
     }
     // Battle Shout
     else if (mPlayerLevel >= 2 && rageValue >= 10 && !mPlayer.hasAura(mBattleShout)) {
@@ -254,6 +254,9 @@ public class WarriorSolver implements RotationSolver, ICommonSettingFunctions {
 
   @Override
   public boolean afterResurrect() {
+    if (mPlayer.inCombat()) {
+      return false;
+    }
     return combatEnd(null);
   }
 

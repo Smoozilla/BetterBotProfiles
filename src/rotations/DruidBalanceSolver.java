@@ -209,6 +209,9 @@ public class DruidBalanceSolver implements RotationSolver, ICommonSettingFunctio
 
   @Override
   public boolean afterResurrect() {
+    if (mPlayer.inCombat()) {
+      return false;
+    }
     return combatEnd(null);
   }
 

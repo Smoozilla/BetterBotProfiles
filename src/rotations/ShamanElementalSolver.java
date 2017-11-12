@@ -286,6 +286,9 @@ public class ShamanElementalSolver implements RotationSolver, ICommonSettingFunc
 
   @Override
   public boolean afterResurrect() {
+    if (mPlayer.inCombat()) {
+      return false;
+    }
     return combatEnd(null);
   }
 

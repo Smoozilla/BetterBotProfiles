@@ -176,7 +176,7 @@ public class MageFrostSolver implements RotationSolver, ICommonSettingFunctions 
     if (!mDrinking && !mEating && !hasEnoughConjuredItems()) {
       return true;
     }
-    
+
     drinkAndEat();
     if (mDrinking || mEating) {
       return true;
@@ -331,7 +331,10 @@ public class MageFrostSolver implements RotationSolver, ICommonSettingFunctions 
 
   @Override
   public boolean afterResurrect() {
-    return !combatEnd(null);
+    if (mPlayer.inCombat()) {
+      return false;
+    }
+    return combatEnd(null);
   }
 
   @Override

@@ -261,6 +261,9 @@ public class PriestSolver implements RotationSolver, ICommonSettingFunctions {
 
   @Override
   public boolean afterResurrect() {
+    if (mPlayer.inCombat()) {
+      return false;
+    }
     return combatEnd(null);
   }
 
